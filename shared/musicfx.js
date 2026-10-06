@@ -114,8 +114,12 @@ function createMusicFx(ac) {
   const lim = ac.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 2; lim.ratio.value = 16; lim.attack.value = 0.003; lim.release.value = 0.15;
   // loudness matching: the effects may colour the music but never make it louder, and their crackle and hiss
   // follow the music's level (and so the volume): the output is turned down to the level of what comes in
+  // Both sides are measured the way ears hear, not as raw energy (roughly A-weighting): bass counts for little and
+  // 1-4 kHz for more. Otherwise "Old radio", which drops the bass and pushes clipped mids, matches on paper but sounds louder.
   const makeup = G(1), aIn = ac.createAnalyser(), aOut = ac.createAnalyser(); aIn.fftSize = aOut.fftSize = 2048;
-  bus.connect(lim).connect(makeup).connect(output); input.connect(aIn); lim.connect(aOut);
+  const weigh = () => { const a = BQ('highpass', 60, 0.5), c = BQ('peaking', 2500, 0.8, 1), d = BQ('lowpass', 12000, 0.7); a.connect(c).connect(d); return [a, d]; };
+  const [wiA, wiB] = weigh(), [woA, woB] = weigh();
+  bus.connect(lim).connect(makeup).connect(output); input.connect(wiA); wiB.connect(aIn); lim.connect(woA); woB.connect(aOut);
   const lvl = new Float32Array(2048), pow = a => { a.getFloatTimeDomainData(lvl); let s = 0; for (let i = 0; i < lvl.length; i++) s += lvl[i] * lvl[i]; return s / lvl.length; };
   let pIn = 0, pOut = 0;
   // always on: the limiter adds a little gain of its own even with every effect off

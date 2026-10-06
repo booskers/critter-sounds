@@ -40,9 +40,10 @@ const fxCode = await readFile(join(shared, 'musicfx.js'), 'utf8');
 await copyFile(join(shared, 'musicfx.js'), join(out, 'musicfx.js'));
 
 // the player, and the soundscape editor that opens in a window of its own
-for (const f of ['style.css', 'app.js', 'fxpresets.js', 'scape.js', 'scape.html', 'scape-editor.js', 'scape.css', 'pcmtap.js', 'tour.js', 'i18n.js', 'i18n-de.js', 'i18n-de2.js', 'notes-bridge.js']) await copyFile(join(here, 'src', f), join(out, f));
+for (const f of ['style.css', 'app.js', 'fxpresets.js', 'scape.js', 'scape.html', 'scape-editor.js', 'scape.css', 'pcmtap.js', 'tour.js', 'i18n.js', 'i18n-de.js', 'i18n-de2.js', 'notes-bridge.js', 'fonts.js',
+  'atkinson-latin.woff2', 'atkinson-latin-ext.woff2', 'atkinson-italic-latin.woff2', 'atkinson-italic-latin-ext.woff2', 'OFL-Atkinson-Hyperlegible-Next.txt']) await copyFile(join(here, 'src', f), join(out, f));
 // the Critter Sounds logo (src/logo.svg) in the header, and its emblem (src/icon.svg, made by make-icons.cjs) in the title bar
-const logo = (await readFile(join(here, 'src', 'logo.svg'), 'utf8')).replace(/^[\s\S]*?(<svg)/, '$1').replace(/<svg[^>]*>/, '<svg class="logo-svg" viewBox="0 0 1924 523" role="img" aria-label="Critter Sounds">');
+const logo = (await readFile(join(here, 'src', 'logo.svg'), 'utf8')).replace(/^[\s\S]*?(<svg)/, '$1').replace(/<svg[^>]*?viewBox="([^"]+)"[^>]*>/, (m, vb) => `<svg class="logo-svg" viewBox="${vb}" role="img" aria-label="Critter Sounds">`);
 await copyFile(join(here, 'src', 'icon.svg'), join(out, 'icon.svg'));
 // the sound pad icons from game-icons.net (CC BY 3.0), fetched once by fetch-gameicons.mjs
 await copyFile(join(here, 'src', 'gameicons.json'), join(out, 'gameicons.json'));

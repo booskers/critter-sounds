@@ -1,6 +1,6 @@
-/* Critter Sounds: plays local playlists, free online libraries and web pages to a Critter table, live.
+/* Critter Sounds: plays local playlists, free online libraries and web pages to a Critter VTT table, live.
    The sound is mixed here (two decks for crossfades, one for a web page, one for sound pads), then sent over WebRTC
-   to every Critter page in the lobby. The effects run on each player's computer (musicfx.js, copied from Critter).
+   to every Critter VTT page in the lobby. The effects run on each player's computer (musicfx.js, copied from Critter VTT).
    The screen is a canvas of windows that split, resize and dock together; the queue sits on the right. */
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
@@ -84,7 +84,7 @@ const srcUrl = x => (x.path ? mediaUrl(x.path) : x.url ? remoteUrl(x.url) : '');
 const keyOf = x => x.path || x.url || '';
 const clone = v => JSON.parse(JSON.stringify(v));
 const errText = e => String(e && e.message || e).replace(/^Error invoking remote method '[^']+': (Error: )?/, '');
-// the music code from Critter's Music window: the lobby code, then the key, like 4TBCEF-EMJQE-SQSW5
+// the music code from Critter VTT's Music window: the lobby code, then the key, like 4TBCEF-EMJQE-SQSW5
 // (also takes "Lobby 4TBCEF, key EMJQE-SQSW5", or the whole thing without dashes)
 function parseMusicCode(s) {
   const parts = String(s || '').toUpperCase().replace(/\b(LOBBY|KEY)\b/g, ' ').split(/[^A-Z0-9]+/).filter(Boolean);
@@ -110,7 +110,7 @@ let toastT = 0;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3800); }
 
 /* ============================== the library: playlists, pads, scenes, layouts, settings ============================== */
-const DEF = () => ({ fadeIn: 2, fadeOut: 3, xfade: 4, crossfade: true, pauseFade: 1, vol: 0.8, shuffle: false, loop: 'all', monitor: false, monVol: 0.7, prevVol: 0.7, theme: { accent: '#8800ff', accent2: '#4cc9f0', tone: 'midnight' }, sink: '', duck: 0.35, name: 'Critter Sounds', lobby: '', key: '', fx: mfxDefaults(), irPath: '', fsKey: '', queueOpen: true, chatLog: true });
+const DEF = () => ({ fadeIn: 2, fadeOut: 3, xfade: 4, crossfade: true, pauseFade: 1, vol: 0.8, shuffle: false, loop: 'all', monitor: false, monVol: 0.7, prevVol: 0.7, theme: { accent: '#8800ff', accent2: '#4cc9f0', tone: 'midnight', scheme: 'dark', tint: 4, bleed: 1, fonts: 'Easy reading' }, sink: '', duck: 0.35, name: 'Critter Sounds', lobby: '', key: '', fx: mfxDefaults(), irPath: '', fsKey: '', queueOpen: true, chatLog: true });
 let LIB = { playlists: [], web: [], pads: [], scenes: [], layouts: [], layout: null, queue: [], ytFiles: {}, sessions: [], tagColors: {}, set: DEF() };
 let saveT = 0;
 const save = () => { clearTimeout(saveT); saveT = setTimeout(() => desk.saveLib(LIB).catch(() => toast('Could not save the library.')), 400); };
@@ -869,7 +869,7 @@ const PANELS = {
   effects: { name: 'Effects', icon: 'sliders', desc: 'Reverb, radio, muffle and more, for everyone', render: panelEffects },
   fades: { name: 'Fades', icon: 'wave', desc: 'How songs fade in, out and into each other', render: panelFades },
   bots: { name: 'Discord & Fluxer', icon: 'headphones', desc: 'Play into a voice channel with your own bot', render: panelBots },
-  log: { name: 'Session log', icon: 'clock', desc: 'What played when, also in Critter\'s chat', render: panelLog },
+  log: { name: 'Session log', icon: 'clock', desc: 'What played when, also in Critter VTT\'s chat', render: panelLog },
   help: { name: 'Help', icon: 'help', desc: 'Shortcuts, tips and thanks', render: panelHelp },
   pick: { name: 'New window', icon: 'plus', render: panelPick, hidden: true }
 };
@@ -929,6 +929,7 @@ function applyLayout(tree) {
 }
 
 function renderTree() {
+  headRO.disconnect();
   const c = $('#canvas');
   const keep = new Map([...c.querySelectorAll('.tbod')].map(b => [b.dataset.id, b.scrollTop]));
   c.replaceChildren(LIB.layout ? nodeEl(LIB.layout) : emptyCanvas());
@@ -961,13 +962,17 @@ function tileEl(leaf) {
   const P = PANELS[leaf.p];
   const head = h('div', { class: 'th', draggable: true, title: 'Drag onto another window to dock it there' },
     h('span', { class: 'ti' }, ico(P.icon)), h('span', { class: 'tt', text: P.name }), h('span', { class: 'tx' }), h('span', { class: 'grow' }),
-    h('button', { type: 'button', class: 'ib', text: '◫', title: 'Split: a new window to the right', onclick: () => { const nl = splitLeaf(leaf, 'row'); touch(nl); } }),
-    h('button', { type: 'button', class: 'ib', text: '⊟', title: 'Split: a new window below', onclick: () => { const nl = splitLeaf(leaf, 'col'); touch(nl); } }),
-    h('button', { type: 'button', class: 'ib', text: '⇄', title: 'Show something else here', onclick: e => choosePanel(e.currentTarget, p => { leaf.p = p; leaf.s = {}; layoutChanged(); }) }),
-    h('button', { type: 'button', class: 'ib', text: '✕', title: 'Close this window', onclick: () => closeLeaf(leaf) }));
+    h('span', { class: 'tbtns' },
+      h('button', { type: 'button', class: 'ib', text: '◫', title: 'Split: a new window to the right', onclick: () => { const nl = splitLeaf(leaf, 'row'); touch(nl); } }),
+      h('button', { type: 'button', class: 'ib', text: '⊟', title: 'Split: a new window below', onclick: () => { const nl = splitLeaf(leaf, 'col'); touch(nl); } }),
+      h('button', { type: 'button', class: 'ib', text: '⇄', title: 'Show something else here', onclick: e => choosePanel(e.currentTarget, p => { leaf.p = p; leaf.s = {}; layoutChanged(); }) })),
+    h('button', { type: 'button', class: 'ib tmore', text: '⋯', title: 'This window\'s buttons', onclick: e => headMenu(leaf, tile, e.currentTarget) }),
+    // ✕ never folds away
+    h('button', { type: 'button', class: 'ib tclose', text: '✕', title: 'Close this window', onclick: () => closeLeaf(leaf) }));
   const body = h('div', { class: 'tbod' }); body.dataset.id = leaf.id;
   const tile = h('div', { class: 'tile' + (leaf.id === focusId ? ' focus' : '') }, head, body, h('div', { class: 'dock' }));
-  tile.dataset.id = leaf.id; tile.dataset.p = leaf.p;
+  tile.dataset.id = leaf.id; tile.dataset.p = leaf.p; tile._tx = head.querySelector('.tx');
+  headRO.observe(head);
   tile.addEventListener('pointerdown', () => { if (focusId !== leaf.id) { document.querySelectorAll('.tile.focus').forEach(t => t.classList.remove('focus')); tile.classList.add('focus'); } touch(leaf); }, true);
   head.addEventListener('dragstart', e => { e.dataTransfer.setData('text/x-tile', leaf.id); e.dataTransfer.effectAllowed = 'move'; document.body.classList.add('docking'); });
   head.addEventListener('dragend', () => { document.body.classList.remove('docking'); document.querySelectorAll('.dock').forEach(d => { d.className = 'dock'; }); });
@@ -1007,10 +1012,11 @@ function renderLeaf(leaf, scroll) {
   const body = document.querySelector(`.tbod[data-id="${leaf.id}"]`); if (!body) return;
   const a = document.activeElement, keep = a && body.contains(a) && a.dataset.k ? { k: a.dataset.k, s: a.selectionStart, e: a.selectionEnd } : null;
   const top = scroll ?? body.scrollTop;
-  const extra = body.parentElement.querySelector('.tx'); extra.replaceChildren();
+  const tile = body.parentElement, extra = tile._tx || tile.querySelector('.tx'); extra.replaceChildren();
   body.replaceChildren();
   try { PANELS[leaf.p].render(body, leaf, extra); } catch (e) { console.error(e); body.append(h('p', { class: 'hint bad', text: 'This window had a problem: ' + errText(e) })); }
   body.scrollTop = top;
+  fitHead(tile.querySelector('.th'), true);
   if (keep) { const f = body.querySelector(`[data-k="${keep.k}"]`); if (f) { f.focus(); try { f.setSelectionRange(keep.s, keep.e); } catch {} } }
 }
 function renderAll() { renderTree(); renderQueue(); paint(); }
@@ -1038,12 +1044,45 @@ function panelPick(body, leaf) {
 
 /* ---------- small menus and a question box ---------- */
 let menuEl = null;
-function closeMenu() { if (menuEl) { menuEl.remove(); menuEl = null; } }
+function closeMenu() { if (menuEl) { if (menuEl._restore) menuEl._restore(); menuEl.remove(); menuEl = null; } }
+// A title bar that can't fit everything folds the window's own controls and its layout buttons behind one ⋯, so the
+// title stays readable. It unfolds again once the window is wide enough for all of it.
+const headRO = new ResizeObserver(es => { for (const e of es) fitHead(e.target); });
+function fitHead(head, fresh) {
+  if (!head || !head.isConnected) return;
+  // 300px or less always folds, whatever fits; wider, it folds only when something overflows
+  if (head.clientWidth > 0 && head.clientWidth <= 300) { head.classList.add('tight'); head.dataset.need = Math.max(301, +head.dataset.need || 0); return; }
+  if (fresh || (head.classList.contains('tight') && head.clientWidth >= +head.dataset.need)) head.classList.remove('tight');
+  if (head.classList.contains('tight')) return;
+  const tt = head.querySelector('.tt'), tx = head.querySelector('.tx');
+  const over = Math.max(0, head.scrollWidth - head.clientWidth) + Math.max(0, tt.scrollWidth - tt.clientWidth) + Math.max(0, tx.scrollWidth - tx.clientWidth);
+  if (over > 1) { head.dataset.need = head.clientWidth + over + 12; head.classList.add('tight'); }
+}
+let headMoreRect = null;
+function headMenu(leaf, tile, anchor) {
+  closeMenu();
+  const tx = tile._tx, mark = document.createComment('tx'), P = PANELS[leaf.p];
+  menuEl = h('div', { class: 'menu thmenu' }, h('div', { class: 'mh', text: P.name }));
+  // the real controls move in while it's open (dropdowns and sliders keep working), and go back when it closes
+  if (tx && tx.childNodes.length) { tx.replaceWith(mark); tx.classList.add('inmenu'); menuEl.append(tx, h('hr')); }
+  menuEl._restore = () => { if (mark.parentNode) { tx.classList.remove('inmenu'); mark.replaceWith(tx); } };
+  const item = (icon, label, fn) => h('button', { type: 'button', class: 'mi', onclick: () => { const r = anchor.getBoundingClientRect(); closeMenu(); fn(r); } }, h('span', { class: 'mic' }, ico(icon)), h('span', { text: label }));
+  menuEl.append(
+    item('splitR', 'Split: a new window to the right', () => { const nl = splitLeaf(leaf, 'row'); touch(nl); }),
+    item('splitD', 'Split: a new window below', () => { const nl = splitLeaf(leaf, 'col'); touch(nl); }),
+    item('swap', 'Show something else here', () => choosePanel(anchor, p => { leaf.p = p; leaf.s = {}; layoutChanged(); })),
+    item('x', 'Close this window', () => closeLeaf(leaf)));
+  document.body.append(menuEl);
+  const r = headMoreRect = anchor.getBoundingClientRect(), w = menuEl.offsetWidth, hh = menuEl.offsetHeight;
+  menuEl.style.left = clamp(r.right - w, 6, innerWidth - w - 6) + 'px';
+  menuEl.style.top = (r.bottom + hh + 6 < innerHeight ? r.bottom + 4 : Math.max(6, r.top - hh - 4)) + 'px';
+}
 function popMenu(anchor, items, x, y) {
   closeMenu();
   menuEl = h('div', { class: 'menu' }, ...items.filter(Boolean).map(it => it === '-' ? h('hr') : it.head ? h('div', { class: 'mh', text: it.head }) : h('button', { type: 'button', class: 'mi' + (it.cls ? ' ' + it.cls : ''), disabled: it.disabled, onclick: () => { closeMenu(); it.fn(); } }, it.dot ? h('span', { class: 'mic' }, h('i', { class: 'mdot', style: `background:${it.dot}` })) : it.icon ? h('span', { class: 'mic' }, ico(it.icon)) : h('span', { class: 'mic' }), it.sub ? h('span', { class: 'mlab' }, h('span', { text: it.label }), h('small', { text: it.sub })) : h('span', { text: it.label }), it.note ? h('span', { class: 'mn', text: it.note }) : null)));
   document.body.append(menuEl);
-  const r = anchor ? anchor.getBoundingClientRect() : { left: x, bottom: y, top: y }, w = menuEl.offsetWidth, hh = menuEl.offsetHeight;
+  let r = anchor ? anchor.getBoundingClientRect() : { left: x, bottom: y, top: y }; const w = menuEl.offsetWidth, hh = menuEl.offsetHeight;
+  if (anchor && !r.width && headMoreRect) r = headMoreRect;
   menuEl.style.left = clamp(r.left, 6, innerWidth - w - 6) + 'px';
   menuEl.style.top = (r.bottom + hh + 6 < innerHeight ? r.bottom + 4 : Math.max(6, r.top - hh - 4)) + 'px';
 }
@@ -1626,7 +1665,7 @@ function panelScapes(body, leaf, extra) {
 }
 
 /* ============================== voice bots: Discord and Fluxer ============================== */
-// For groups that meet in Discord or Fluxer instead of Critter: a bot of their own joins a voice channel and plays the
+// For groups that meet in Discord or Fluxer instead of Critter VTT: a bot of their own joins a voice channel and plays the
 // same mix the table hears, effects and all (bots/bot.js, the way Kenku FM does it). The mix is tapped after the effects
 // as 48 kHz 16-bit PCM by an AudioWorklet (pcmtap.js), and sent only while a bot is in a channel.
 const BOT = { tap: null, cfg: null, st: { discord: { state: 'off' }, fluxer: { state: 'off' } }, guilds: { discord: [], fluxer: [] }, user: {}, invite: '', err: {}, sel: { discord: {}, fluxer: {} }, rejoin: { discord: null, fluxer: null } };
@@ -1764,9 +1803,9 @@ function botCard(svc) {
 }
 function panelBots(body) {
   if (!BOT.cfg) { botCfg(); body.append(h('p', { class: 'hint', text: 'Loading…' })); return; }
-  body.append(tip('bots', 'No Critter? Play to a voice channel instead. A bot of your own joins Discord or Fluxer and plays exactly what the table would hear, effects included. It works alongside Critter too.'),
+  body.append(tip('bots', 'No Critter VTT? Play to a voice channel instead. A bot of your own joins Discord or Fluxer and plays exactly what the table would hear, effects included. It works alongside Critter VTT too.'),
     botCard('discord'), botCard('fluxer'),
-    tip('bots-voice', 'Voice chat compresses sound more than Critter does, so quiet ambiences can sound thinner. Keep "Here" off while listening in the voice channel, or you\'ll hear everything twice.'));
+    tip('bots-voice', 'Voice chat compresses sound more than Critter VTT does, so quiet ambiences can sound thinner. Keep "Here" off while listening in the voice channel, or you\'ll hear everything twice.'));
 }
 
 /* ---------- colours: the Critter Sounds purple by default, or any you like ---------- */
@@ -1781,7 +1820,13 @@ function applyTheme() {
   const t = { ...DEF().theme, ...(S().theme || {}) }, st = document.documentElement.style, tone = TONES[t.tone] || TONES.midnight;
   st.setProperty('--accent', t.accent); st.setProperty('--accent2', t.accent2);
   st.setProperty('--accent-ink', inkOn(t.accent)); st.setProperty('--accent2-ink', inkOn(t.accent2));
-  for (const k of ['bg', 'panel', 'panel2', 'line']) st.setProperty('--' + k, tone[k]);
+  // the shared design system: the background tone, light or dark, the surface tint, picture colour and fonts
+  for (const k of ['bg', 'panel', 'panel2', 'line']) st.removeProperty('--' + k);
+  st.setProperty('--tone-dark', tone.bg);
+  document.documentElement.dataset.theme = t.scheme === 'light' ? 'light' : 'dark';
+  st.setProperty('--hue', (Number.isFinite(t.tint) ? t.tint : 4) + '%');
+  st.setProperty('--bleed', Number.isFinite(t.bleed) ? t.bleed : 1);
+  applyFontSet(document.documentElement, t.fonts || 'Easy reading');
 }
 function appearance() {
   if (document.querySelector('.modal')) return;
@@ -1794,8 +1839,20 @@ function appearance() {
     h('div', { class: 'row' }, h('b', { class: 'grow', text: 'Appearance' }), h('button', { type: 'button', class: 'ib', text: '✕', title: 'Close', onclick: () => box.remove() })),
     h('div', { class: 'sec', text: 'Highlight' }), h('p', { class: 'hint', text: 'Buttons, the playing track, sliders and selections.' }), swatches('accent'),
     h('div', { class: 'sec', text: 'Second highlight' }), h('p', { class: 'hint', text: 'Previews, the level meter and other details.' }), swatches('accent2'),
+    h('div', { class: 'sec', text: 'Light or dark' }),
+    h('div', { class: 'seg' }, ...[['dark', 'Dark'], ['light', 'Light']].map(([k, l]) => h('button', { type: 'button', class: (t.scheme || 'dark') === k ? 'on' : '', text: l, onclick: () => set({ scheme: k }) }))),
     h('div', { class: 'sec', text: 'Background' }),
     h('div', { class: 'seg' }, ...Object.entries(TONES).map(([k, v]) => h('button', { type: 'button', class: t.tone === k ? 'on' : '', text: v.name, onclick: () => set({ tone: k }) }))),
+    h('div', { class: 'sec', text: 'Surface tint' }), h('p', { class: 'hint', text: 'How much the highlight colours the background and the windows.' }),
+    (() => { const r = h('input', { type: 'range', min: 0, max: 14, step: 1, value: Number.isFinite(t.tint) ? t.tint : 4, 'aria-label': 'Surface tint', oninput: e => { t.tint = +e.target.value; paintRange(e.target); applyTheme(); save(); } }); paintRange(r); return r; })(),
+    h('div', { class: 'sec', text: 'Picture colour' }), h('p', { class: 'hint', text: 'How far the cover of what\'s playing spills its colours into the bar.' }),
+    h('div', { class: 'seg' }, ...[[0, 'Off'], [0.6, 'Soft'], [1, 'Full']].map(([v, l]) => h('button', { type: 'button', class: (Number.isFinite(t.bleed) ? t.bleed : 1) === v ? 'on' : '', text: l, onclick: () => set({ bleed: v }) }))),
+    h('div', { class: 'sec', text: 'Fonts' }),
+    h('div', { class: 'fontsets', role: 'radiogroup', 'aria-label': 'Fonts' }, ...FONT_SETS.map(([n, d, u]) => {
+      const on = (t.fonts || 'Easy reading') === n, b = h('button', { type: 'button', role: 'radio', 'aria-checked': String(on), class: 'fontset' + (on ? ' on' : ''), onclick: () => set({ fonts: n }) },
+        h('small', { text: n }), h('b', { text: 'The dragon rolls a 20' }), h('span', { text: d === u ? d : `${d} + ${u}` }));
+      applyFontSet(b, n); return b;
+    })),
     h('div', { class: 'row end' }, h('button', { type: 'button', class: 'btn ghost', text: 'Back to Critter Sounds colours', onclick: () => set({ ...DEF().theme }) }), h('button', { type: 'button', class: 'btn primary', text: 'Done', onclick: () => box.remove() })));
   const box = h('div', { class: 'modal', onpointerdown: e => { if (e.target === box) box.remove(); } }, card);
   draw(); document.body.append(box);
@@ -1957,7 +2014,7 @@ function panelFades(body) {
     row('Pause fade', 'pauseFade', 0, 5, 0.25, 'How long pausing and resuming takes'),
     h('p', { class: 'hint', text: 'Stop fades out. Press stop again to cut the sound at once.' }));
 }
-/* ---------- the session log: what played when, here and (as small notes) in Critter's chat ---------- */
+/* ---------- the session log: what played when, here and (as small notes) in Critter VTT's chat ---------- */
 const SLOG = { lastPad: new Map(), writes: 0 };
 const curSession = () => LIB.sessions[LIB.sessions.length - 1] || newSession(true);
 function newSession(quiet) {
@@ -1982,7 +2039,7 @@ function logEvent(ev, text, o = {}) {
   const ses = curSession(); ses.entries.push(e); if (ses.entries.length > 2000) ses.entries.shift();
   save(); renderPanels('log'); pushLog(e); botNote(e);
 }
-// to Critter: lobbies/<code>/soundlog/<id>, the newest 100 kept
+// to Critter VTT: lobbies/<code>/soundlog/<id>, the newest 100 kept
 async function pushLog(e) {
   if (!NET.on || !NET.db || !S().chatLog) return;
   const doc = { ev: e.ev, text: e.text.slice(0, 120), n: S().name || 'Critter Sounds', ts: e.ts };
@@ -2001,9 +2058,9 @@ function panelLog(body, leaf, extra) {
   const ses = ss.find(x => x.id === leaf.s.sid);
   extra.append(ss.length ? h('select', { class: 'hsel', title: 'Earlier sessions', onchange: e => { leaf.s.sid = e.target.value; renderLeaf(leaf); } },
     ...ss.slice().reverse().map(x => h('option', { value: x.id, text: new Date(x.start).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) + (x.lobby ? ' · ' + x.lobby : ''), selected: x === ses }))) : null,
-    h('button', { type: 'button', class: 'btn tiny', text: '＋ New session', title: 'Start a new session (Critter\'s chat says so)', onclick: () => { const n = newSession(); leaf.s.sid = n.id; renderLeaf(leaf); } }),
+    h('button', { type: 'button', class: 'btn tiny', text: '＋ New session', title: 'Start a new session (Critter VTT\'s chat says so)', onclick: () => { const n = newSession(); leaf.s.sid = n.id; renderLeaf(leaf); } }),
     ses ? h('button', { type: 'button', class: 'btn tiny ghost', text: 'Copy', title: 'Copy this session\'s log as text', onclick: () => navigator.clipboard.writeText([`Session ${new Date(ses.start).toLocaleString()}${ses.lobby ? ' · ' + ses.lobby : ''}`, ...ses.entries.map(e => `${hhmm(e.ts)}  ${e.text}`)].join('\n')).then(() => toast('Copied the log.'), () => toast('Couldn\'t copy.')) }) : null);
-  body.append(h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: S().chatLog, onchange: e => { S().chatLog = e.target.checked; save(); } }), 'Show it in Critter\'s chat too, as small notes'));
+  body.append(h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: S().chatLog, onchange: e => { S().chatLog = e.target.checked; save(); } }), 'Show it in Critter VTT\'s chat too, as small notes'));
   if (!ses || !ses.entries.length) { body.append(h('div', { class: 'empty', text: 'Nothing played yet. Connecting to a table starts a session; every track, page and pad played shows here.' })); return; }
   const list = h('div', { class: 'slog' });
   for (const e of ses.entries.slice().reverse()) {
@@ -2020,8 +2077,8 @@ function panelHelp(body) {
   const k = (keys, what) => h('tr', {}, h('td', {}, ...keys.map(x => h('span', { class: 'kbd', text: x }))), h('td', { text: what }));
   body.append(h('div', { class: 'card' }, h('b', { text: 'Getting started' }), h('ol', {},
     h('li', { text: 'Make a playlist from a music folder (Playlists window), or find music in the Online library.' }),
-    h('li', { text: 'In Critter, the lobby owner opens Music and copies the music code. Paste it at the top and press Connect.' }),
-    h('li', { text: 'Press play. Everyone at the table hears it, through their own Critter and with their own volume.' }))));
+    h('li', { text: 'In Critter VTT, the lobby owner opens Music and copies the music code. Paste it at the top and press Connect.' }),
+    h('li', { text: 'Press play. Everyone at the table hears it, through their own Critter VTT and with their own volume.' }))));
   body.append(h('div', { class: 'card' }, h('b', { text: 'Windows' }), h('ul', {},
     h('li', { text: '◫ and ⊟ split a window to the right or below. Drag the line between two windows to resize them; it clicks into place at halves, thirds and quarters (hold Alt to place it freely). Double-click the line to make both halves equal.' }),
     h('li', { text: 'Drag a window by its title onto another one: near an edge it docks there, in the middle the two swap.' }),
@@ -2034,7 +2091,7 @@ function panelHelp(body) {
     h('li', { text: 'Your music isn\'t uploaded: it plays live from this computer, so there are no size limits. Keep the app open while you play.' }),
     h('li', { text: 'The queue on the right plays first; then the playlist you last played from carries on. A track leaves the queue when it starts.' }),
     h('li', { text: 'Sound pad icons are by Lorc, Delapouite and others from game-icons.net, under CC BY 3.0.' }),
-    h('li', { text: 'Turn on "Here" in the bar to listen on this computer, with the effects. Leave it off if you also have Critter open here, or you\'ll hear it twice.' }),
+    h('li', { text: 'Turn on "Here" in the bar to listen on this computer, with the effects. Leave it off if you also have Critter VTT open here, or you\'ll hear it twice.' }),
     h('li', { text: 'Online library: Tabletop Audio, Incompetech, Openverse and Freesound, free to use with credit. 🎧 Preview plays on this computer only, at its own volume. Tick several results to queue them, add them to a playlist or make pads in one go. ⭳ saves to Music › Critter Sounds to play offline.' }))));
   // the people and projects Critter Sounds is built on
   const ty = (name, url, what) => h('li', {}, h('a', { href: url, text: name, onclick: e => { e.preventDefault(); desk.openExternal(url); } }), h('span', { text: ': ' + what }));
@@ -2051,8 +2108,8 @@ function panelHelp(body) {
       ty('Fluxer', 'https://fluxer.app', 'and fluxer.js, with LiveKit\'s rtc-node, for the Fluxer bot.'),
       ty('opusscript, prism-media and @noble/ciphers', 'https://github.com/abalabahaha/opusscript', 'for encoding and encrypting the voice stream without anything to compile.'),
       ty('Electron', 'https://www.electronjs.org', 'and Chromium, whose Web Audio and WebRTC carry every sound to the table.'),
-      ty('Cloudflare Workers', 'https://workers.cloudflare.com', 'for running Homebase, which connects this app to Critter.'),
-      h('li', { text: 'Critter, the table this app plays to, and everyone who plays at it.' }))));
+      ty('Cloudflare Workers', 'https://workers.cloudflare.com', 'for running Homebase, which connects this app to Critter VTT.'),
+      h('li', { text: 'Critter VTT, the table this app plays to, and everyone who plays at it.' }))));
 }
 
 /* ============================== learning Critter Sounds: setup, a quick tour and a full tour ============================== */
@@ -2076,8 +2133,8 @@ const T_PLAYLISTS = { el: tileOf('playlists'), title: 'Playlists', text: ['"From
 const T_TRACKS = { el: tileOf('playlist'), title: 'The tracks', text: 'Double-click a track to play it. Select tracks and press Q, or drag them onto the queue, to play them next. Right-click a track for more.' };
 const T_QUEUE = { el: '#queue', title: 'Up next', text: 'The queue plays first, then the playlist you played from carries on. Drag to reorder, ✕ to remove. Sound pads that are playing show up below it. ☰ Queue in the top bar hides or shows it.' };
 const T_PLAY = { el: '#bar .trans', title: 'Playing', list: ['▶ plays and pauses, always with a gentle fade', '■ fades out; press it twice to stop at once', '⏮ ⏭ go back and ahead', '⇄ shuffles, ⟳ repeats the playlist or one track'] };
-const T_VOLS = { el: '#bar .vols', title: 'Two volumes', text: ['Table is how loud everyone hears it.', 'Here plays it on this computer too, with the effects, so you can listen along. Leave it off if Critter is open on this computer as well, or you\'ll hear it twice.'] };
-const T_CONN = { el: '#conn', title: 'Playing to your table', text: ['In Critter, the lobby owner opens the Music window and copies the music code. Paste it here and press Connect: everyone in the lobby hears what you play.', 'Meeting in Discord or Fluxer instead? The "Discord & Fluxer" window puts a bot of your own in a voice channel.'] };
+const T_VOLS = { el: '#bar .vols', title: 'Two volumes', text: ['Table is how loud everyone hears it.', 'Here plays it on this computer too, with the effects, so you can listen along. Leave it off if Critter VTT is open on this computer as well, or you\'ll hear it twice.'] };
+const T_CONN = { el: '#conn', title: 'Playing to your table', text: ['In Critter VTT, the lobby owner opens the Music window and copies the music code. Paste it here and press Connect: everyone in the lobby hears what you play.', 'Meeting in Discord or Fluxer instead? The "Discord & Fluxer" window puts a bot of your own in a voice channel.'] };
 const T_EDIT = { el: () => document.querySelector('.tile[data-p="playlist"] .th') || document.querySelector('.tile .th'), title: 'Make it yours', text: 'Every window has these buttons in its title bar:', list: ['◫ splits it: a new window to the right. ⊟ splits it downwards', '⇄ shows something else in the same window', '✕ closes it', 'Drag a window by its title onto another: near an edge it docks there, on the middle the two swap', 'Drag the line between two windows to resize them. It clicks into place at halves, thirds and quarters'], wide: true };
 function tourBasic(finish) {
   return [
@@ -2109,12 +2166,12 @@ function tourFull(finish) {
     { el: tileOf('scenes'), title: 'Scenes', text: 'A scene remembers a playlist with its effects, volume and repeat. Starting one crossfades into it: from the tavern to a fight in one click.' },
     { el: tileOf('effects'), title: 'Effects', text: 'Reverb, radio, muffle, crackle and more, with presets like "Underwater" and "Old gramophone". They play on everyone\'s computer and never make the music louder.' },
     { before: lay(SP('row', 0.5, SP('col', 0.5, L('fades'), L('log')), SP('col', 0.5, L('web'), L('bots')))), el: tileOf('fades'), title: 'Fades', text: 'How long songs take to fade in and out, and whether one track crossfades into the next.' },
-    { el: tileOf('log'), title: 'Session log', text: 'What played when, session by session. It also shows as small notes in Critter\'s chat (you can switch that off), and Copy gives the text.' },
+    { el: tileOf('log'), title: 'Session log', text: 'What played when, session by session. It also shows as small notes in Critter VTT\'s chat (you can switch that off), and Copy gives the text.' },
     { el: tileOf('web'), title: 'Web source', text: 'Open any web page that plays sound, like an ambience site or a video, and its sound goes to the table.' },
     { el: tileOf('bots'), title: 'Discord & Fluxer', text: 'For groups that meet in a voice channel: a bot of your own joins and plays exactly what the table would hear. It signs in on its own once its token is saved.' },
     T_CONN,
     { el: '#themeBtn', title: 'Look', text: 'Change the highlight colours and the background: any colour you like.' },
-    { el: '#miniBtn', title: 'Mini player', text: 'A small player that stays on top of other apps (Ctrl+M), with Up next and a few pads. Handy while you run the game in Critter.' },
+    { el: '#miniBtn', title: 'Mini player', text: 'A small player that stays on top of other apps (Ctrl+M), with Up next and a few pads. Handy while you run the game in Critter VTT.' },
     { before: lay(presetTree('Run a game')), el: '#helpBtn', title: 'That\'s everything', text: ['Help has the quick tour, this tour, the setup, and the Help window with every shortcut.', 'Keep the "Run a game" layout, or go back to what you had?'], actions: finish }
   ];
 }
@@ -2137,11 +2194,11 @@ function onboarding() {
   const STEPS = [
     () => [h('div', { class: 'onblogo' }, (document.querySelector('#top .brand svg') || h('span')).cloneNode(true)),
       h('h2', { text: 'Welcome to Critter Sounds' }),
-      h('p', { text: 'Music, sound effects and ambience for your tabletop game, played live to everyone at your table: in Critter, or in a Discord or Fluxer voice channel.' }),
+      h('p', { text: 'Music, sound effects and ambience for your tabletop game, played live to everyone at your table: in Critter VTT, or in a Discord or Fluxer voice channel.' }),
       h('p', { class: 'hint', text: 'Three quick questions set it up for you. You can skip, and change everything later.' })],
     () => [h('h2', { text: 'Where does your group listen?' }),
-      choice('listen', 'critter', 'home', 'In Critter', 'Everyone hears it in their own Critter, with their own volume.'),
-      st.listen === 'critter' ? h('div', { class: 'onbsub' }, h('p', { class: 'hint', text: 'The lobby owner finds the music code in Critter\'s Music window. You can also paste it into the top bar later.' }),
+      choice('listen', 'critter', 'home', 'In Critter VTT', 'Everyone hears it in their own Critter VTT, with their own volume.'),
+      st.listen === 'critter' ? h('div', { class: 'onbsub' }, h('p', { class: 'hint', text: 'The lobby owner finds the music code in Critter VTT\'s Music window. You can also paste it into the top bar later.' }),
         h('div', { class: 'row' }, h('input', { type: 'text', class: 'grow', id: 'onbCode', placeholder: 'Music code, like 4TBCEF-EMJQE-SQSW5', value: $('#mcode').value }),
           h('button', { type: 'button', class: 'btn primary', text: 'Connect', onclick: () => { const v = $('#onbCode').value.trim(); if (!v) return; $('#mcode').value = v; connect(); toast('Connecting to the table…'); } }))) : null,
       choice('listen', 'bots', 'headphones', 'In Discord or Fluxer', 'A bot of your own plays into your voice channel. Its window opens when setup is done.'),
@@ -2210,7 +2267,7 @@ async function settings() {
         slider('Music dips under pads to', 'duck', 0, 1, 0.05, v => Math.round(v * 100) + '%'),
         slider('Pause fade', 'pauseFade', 0, 5, 0.1, v => v.toFixed(1) + 's'),
         slider('Preview volume', 'prevVol', 0, 1, 0.05, v => Math.round(v * 100) + '%'),
-        chk('Show what plays in Critter\'s chat', 'Small notes in the lobby\'s chat, from the session log.', () => s.chatLog !== false, v => { s.chatLog = v; })),
+        chk('Show what plays in Critter VTT\'s chat', 'Small notes in the lobby\'s chat, from the session log.', () => s.chatLog !== false, v => { s.chatLog = v; })),
       sec('Folders',
         h('p', { class: 'hint', text: 'Downloads, YouTube, soundscapes and rendered loops go here. Moving it doesn\'t move what\'s already saved.' }),
         dirLine,
@@ -2222,7 +2279,7 @@ async function settings() {
           h('button', { type: 'button', class: 'btn tiny ghost', text: 'Open the app\'s data folder', title: 'Your library, settings and bot tokens', onclick: () => desk.dataFolder() }),
           h('button', { type: 'button', class: 'btn tiny ghost', text: 'Back up the library…', title: 'Playlists, pads, scenes, layouts and settings, as one file', onclick: async () => { await desk.saveLib(LIB).catch(() => {}); const f = await desk.libBackup(); if (f) toast('Saved a backup: ' + f); } }))),
       sec('Connection',
-        h('div', { class: 'row' }, h('span', { class: 'grow hint', text: 'Homebase connects this app to Critter. Use the same one as your table.' }), h('button', { type: 'button', class: 'btn tiny', text: 'Homebase…', onclick: () => { box.remove(); if (window.CRITBOARD_DESKTOP) window.CRITBOARD_DESKTOP.changeHomebase(); } }))),
+        h('div', { class: 'row' }, h('span', { class: 'grow hint', text: 'Homebase connects this app to Critter VTT. Use the same one as your table.' }), h('button', { type: 'button', class: 'btn tiny', text: 'Homebase…', onclick: () => { box.remove(); if (window.CRITBOARD_DESKTOP) window.CRITBOARD_DESKTOP.changeHomebase(); } }))),
       sec('Tips and help',
         h('div', { class: 'row' },
           h('button', { type: 'button', class: 'btn tiny', text: 'Show all tips again', onclick: resetTips }),
@@ -2316,9 +2373,9 @@ function paintConn() {
   const rc = NET.room && NET.room.connected();
   chip(rc ? `${NET.code} · ${live}/${table} hearing it` : `${NET.code} · reconnecting…`, !rc ? 'warn' : live ? 'ok' : '');
   const ks = NET.keyState;
-  if (ks === 'none') hint('That\'s only the lobby code. Paste the whole music code from Critter\'s Music window (the lobby owner has it); the table only plays music from an app that has it.', 'warn');
-  else if (ks === 'off') hint('The lobby owner hasn\'t made a music code yet (Critter › Music), so the table won\'t play this app.', 'warn');
-  else if (ks === 'bad') hint('That music code is out of date: the owner made a new one. Copy it again from Critter\'s Music window.', 'bad');
+  if (ks === 'none') hint('That\'s only the lobby code. Paste the whole music code from Critter VTT\'s Music window (the lobby owner has it); the table only plays music from an app that has it.', 'warn');
+  else if (ks === 'off') hint('The lobby owner hasn\'t made a music code yet (Critter VTT › Music), so the table won\'t play this app.', 'warn');
+  else if (ks === 'bad') hint('That music code is out of date: the owner made a new one. Copy it again from Critter VTT\'s Music window.', 'bad');
   else if (NET.otherDj) hint('Another Critter Sounds app is in this lobby too. The table plays whichever joined first.', 'warn');
   else if (!table) hint('Connected. Nobody has the table open yet; they\'ll hear the music as soon as they do.');
   else hint('');

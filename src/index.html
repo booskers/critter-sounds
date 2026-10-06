@@ -10,9 +10,9 @@
 <script src="musicfx.js"></script>
 </head>
 <body>
-<!-- the window's title bar: the window is frameless, so the page draws Critter's kind of bar itself -->
+<!-- the window's title bar: the window is frameless, so the page draws Critter VTT's kind of bar itself -->
 <div id="titlebar">
-  <button type="button" class="wb-brand" id="appMenu" title="Critter Sounds menu" aria-haspopup="menu"><img class="wb-logo" src="icon.svg" alt=""><span class="wb-name">Critter Sounds</span><svg class="wb-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button type="button" class="wb-brand" id="appMenu" title="Critter Sounds menu" aria-label="Critter Sounds menu" aria-haspopup="menu"><img class="wb-logo" src="icon.svg" alt=""><svg class="wb-caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="wb-title" id="winTitle"></div>
   <div class="wb-ctl">
     <button type="button" class="wb-min" title="Minimize" aria-label="Minimize"><svg viewBox="0 0 10 10"><path d="M0 5.5h10"/></svg></button>
@@ -23,7 +23,7 @@
 <header id="top">
   <div class="brand"><!--LOGO--></div>
   <form id="conn" class="conn" autocomplete="off">
-    <label class="fld wide" title="The lobby owner finds it in Critter's Music window"><span>Music code</span><input id="mcode" maxlength="60" spellcheck="false" placeholder="4TBCEF-EMJQE-SQSW5"></label>
+    <label class="fld wide" title="The lobby owner finds it in Critter VTT's Music window"><span>Music code</span><input id="mcode" maxlength="60" spellcheck="false" placeholder="4TBCEF-EMJQE-SQSW5"></label>
     <button type="submit" id="connBtn" class="btn primary">Connect</button>
     <span id="connState" class="chip">Not connected</span>
   </form>
@@ -83,6 +83,7 @@
 <script src="fxpresets.js"></script>
 <script src="scape.js"></script>
 <script src="tour.js"></script>
+<script src="fonts.js"></script>
 <script src="app.js"></script>
 <script src="notes-bridge.js"></script>
 </body>

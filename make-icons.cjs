@@ -1,17 +1,11 @@
-// Makes Critter Sounds' icons from the emblem in src/logo.svg (the headphones on the left):
+// Makes the app's icons from its mark in src/icon.svg (cut from the logo, square):
 //   build/icon.ico (16 to 256 px, for Windows and the installer), build/icon.png and assets/icon.png (1024 px)
 // Run it with Electron, which draws the SVG:  npx electron make-icons.cjs
 const { app, BrowserWindow } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const svg = fs.readFileSync(path.join(__dirname, 'src', 'logo.svg'), 'utf8');
-// the emblem is the first path, drawn at -313.634,-296.626 inside a 1924 x 523 drawing
-const emblem = (/<path d="([^"]+)" style="fill:rgb\(136,0,255\);"\/>/.exec(svg) || [])[1];
-if (!emblem) throw new Error('no emblem found in logo.svg');
-// square around the emblem (641 x 523 at 313.6,296.6), with a little room around it
-const box = { x: 313.634 - 12, y: 296.626 + 523 / 2 - (641.3 + 24) / 2, s: 641.3 + 24 };
-const icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box.x} ${box.y} ${box.s} ${box.s}"><path d="${emblem}" fill="#8800ff"/></svg>`;
+const icon = fs.readFileSync(path.join(__dirname, 'src', 'icon.svg'), 'utf8');
 const SIZES = [16, 20, 24, 32, 40, 48, 64, 128, 256];
 
 function ico(pngs) {
@@ -41,7 +35,6 @@ app.whenReady().then(async () => {
   fs.writeFileSync(path.join(__dirname, 'build', 'icon.png'), big);
   fs.writeFileSync(path.join(__dirname, 'assets', 'icon.png'), big);
   fs.writeFileSync(path.join(__dirname, 'build', 'icon.ico'), ico(out.sizes.map(([size, b]) => ({ size, buf: Buffer.from(b, 'base64') }))));
-  fs.writeFileSync(path.join(__dirname, 'src', 'icon.svg'), icon);
   console.log('icons made:', SIZES.join(', '), 'px and 1024 px');
   app.quit();
 });

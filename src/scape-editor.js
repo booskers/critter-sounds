@@ -552,7 +552,10 @@ const inkOn = hex => { const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exe
 function applyTheme(t) {
   t = { accent: '#8800ff', accent2: '#4cc9f0', tone: 'midnight', ...(t || {}) }; const st = document.documentElement.style, tone = TONES[t.tone] || TONES.midnight;
   st.setProperty('--accent', t.accent); st.setProperty('--accent2', t.accent2); st.setProperty('--accent-ink', inkOn(t.accent)); st.setProperty('--accent2-ink', inkOn(t.accent2));
-  for (const k of ['bg', 'panel', 'panel2', 'line']) st.setProperty('--' + k, tone[k]);
+  // the same look as the main window (the shared design system)
+  st.setProperty('--tone-dark', tone.bg); document.documentElement.dataset.theme = t.scheme === 'light' ? 'light' : 'dark';
+  st.setProperty('--hue', (Number.isFinite(t.tint) ? t.tint : 4) + '%'); st.setProperty('--bleed', Number.isFinite(t.bleed) ? t.bleed : 1);
+  applyFontSet(document.documentElement, t.fonts || 'Easy reading');
 }
 (async () => {
   const lib = await desk.loadLib().catch(() => null);
