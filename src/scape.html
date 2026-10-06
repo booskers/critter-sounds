@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soundscape editor</title>
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="scape.css">
+<script src="i18n-de.js"></script>
+<script src="i18n-de2.js"></script>
+<script src="i18n.js"></script>
+<script src="musicfx.js"></script>
+<script src="fxpresets.js"></script>
+<script src="scape.js"></script>
+<script src="tour.js"></script>
+</head>
+<body class="scape">
+<div id="titlebar">
+  <div class="wb-brand"><img class="wb-logo" src="icon.svg" alt=""><span class="wb-name">Soundscape editor</span></div>
+  <div class="wb-title" id="winTitle"></div>
+  <div class="wb-ctl">
+    <button type="button" class="wb-min" title="Minimize" aria-label="Minimize"><svg viewBox="0 0 10 10"><path d="M0 5.5h10"/></svg></button>
+    <button type="button" class="wb-max" title="Maximize" aria-label="Maximize"><svg class="sq" viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9"/></svg><svg class="rs" viewBox="0 0 10 10"><rect x=".5" y="2.5" width="7" height="7"/><path d="M2.5 2.5V.5h7v7h-2"/></svg></button>
+    <button type="button" class="wb-close" title="Close" aria-label="Close"><svg viewBox="0 0 10 10"><path d="M.5.5l9 9M9.5.5l-9 9"/></svg></button>
+  </div>
+</div>
+<div id="stop">
+  <button type="button" id="scIcon" class="sci" title="The soundscape's icon is picked in the main window"></button>
+  <input type="text" id="scName" maxlength="60" placeholder="Name this soundscape">
+  <button type="button" id="playB" class="btn primary"></button>
+  <span id="playSt" class="hint"></span>
+  <span class="grow"></span>
+  <span id="saveSt" class="hint"></span>
+  <button type="button" id="fitB" class="btn ghost" title="Show every node (F)"></button>
+  <button type="button" id="renderB" class="btn" title="Render a seamless loop to a WAV file"></button>
+  <button type="button" id="helpB" class="btn ghost" title="The guided first loop, and how it works"></button>
+</div>
+<div id="ed">
+  <aside id="pal"><input type="text" id="palQ" placeholder="Find a node…"><div id="palL"></div></aside>
+  <div id="cv" tabindex="0">
+    <div id="world"><svg id="wires"></svg><div id="nodes"></div></div>
+    <div id="cvHint"></div>
+    <div id="zoomSt" class="hint"></div>
+  </div>
+</div>
+<div id="toast" hidden></div>
+<script src="scape-editor.js"></script>
+</body>
+</html>

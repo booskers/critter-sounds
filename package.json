@@ -1,0 +1,53 @@
+{
+  "name": "critboard-music",
+  "productName": "Critter Sounds",
+  "version": "1.0.0",
+  "description": "Critter Sounds: plays your music to a Critter table, live, with fades and effects.",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "build-www": "node build.mjs",
+    "start": "node build.mjs && electron .",
+    "dist": "node build.mjs && electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "app.critboard.music",
+    "productName": "Critter Sounds",
+    "npmRebuild": false,
+    "files": [
+      "!node_modules/node-webcodecs/**/*",
+      "main.js",
+      "preload.js",
+      "assets/**/*",
+      "nodes-guide/**/*",
+      "bots/**/*",
+      "www/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Critter Sounds"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.19.2",
+    "@fluxerjs/core": "^3.2.0",
+    "@fluxerjs/voice": "^3.1.0",
+    "@noble/ciphers": "^2.4.0",
+    "discord.js": "^14.27.0",
+    "opusscript": "^0.0.8",
+    "prism-media": "^1.3.5"
+  }
+}
