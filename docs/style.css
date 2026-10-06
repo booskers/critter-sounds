@@ -11,7 +11,7 @@
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
-img{max-width:100%;display:block}
+img{max-width:100%;height:auto;display:block}
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 
 /* nav */
@@ -22,6 +22,21 @@ nav .brand img{height:30px;width:auto}
 nav .links{margin-left:auto;display:flex;gap:22px;font-size:16px}
 nav .links a{text-decoration:none;color:var(--muted)}
 nav .links a:hover{color:var(--ink)}
+
+/* "Check out also": the other app, in a slim strip at the top of the header */
+.promo{display:block;text-decoration:none;font-size:14px;border-bottom:1px solid var(--line)}
+.promo .wrap{display:flex;align-items:center;justify-content:center;gap:10px;height:38px;white-space:nowrap;overflow:hidden}
+.promo img{width:20px;height:20px;border-radius:5px;flex:none}
+.promo .lbl{color:var(--muted)}
+.promo b{font-weight:800}
+.promo .what{color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.promo .go{flex:none;font-weight:700}
+.promo.to-sounds{background:linear-gradient(90deg,rgba(136,0,255,.10),rgba(136,0,255,.22),rgba(136,0,255,.10))}
+.promo.to-sounds b,.promo.to-sounds .go{color:var(--purple)}
+.promo.to-critter{background:linear-gradient(90deg,rgba(232,88,76,.08),rgba(232,88,76,.18),rgba(232,88,76,.08))}
+.promo.to-critter b,.promo.to-critter .go{color:var(--red)}
+.promo:hover .go{text-decoration:underline}
+@media (max-width:600px){.promo .what{display:none}}
 
 /* hero */
 .hero{position:relative;padding:96px 0 72px;text-align:center;overflow:hidden}
