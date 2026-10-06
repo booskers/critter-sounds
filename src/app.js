@@ -1029,7 +1029,7 @@ function miniLayout(n) {
 function emptyCanvas() {
   const logo = document.querySelector('#top .brand svg');
   return h('div', { class: 'blank first' },
-    h('div', { class: 'blogo' }, logo ? logo.cloneNode(true) : h('img', { src: 'icon.svg', alt: '' })),
+    h('div', { class: 'blogo' }, logo ? logo.cloneNode(true) : h('span', { class: 'logomark', 'aria-hidden': 'true' })),
     h('h2', { text: 'Nothing here' }),
     h('p', { class: 'lead', text: 'Click on Windows to add your first window, or select a layout.' }),
     h('div', { class: 'row center' },

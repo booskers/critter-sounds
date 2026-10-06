@@ -691,5 +691,9 @@ body.playing .now::before{animation:none}
 .brand .logo-svg{width:auto;height:34px;aspect-ratio:1819/382;color:var(--ink)}
 .blank.first .blogo svg,.onblogo svg{color:var(--ink)}
 .wb-logo{width:20px;height:20px}
+/* the logo's mark takes the user's highlight colour (a bit darker on light backgrounds) */
+:root{--logo-c:var(--accent)}:root[data-theme=light]{--logo-c:color-mix(in oklab,var(--accent) 72%,black)}
+.wb-logo.logomark{background:var(--logo-c);-webkit-mask:url(icon.svg) center/contain no-repeat;mask:url(icon.svg) center/contain no-repeat}
+.blogo .logomark{display:block;width:96px;height:96px;margin:0 auto}
 .modal .card.appear{width:min(560px,calc(100vw - 32px));max-height:86vh;overflow:auto}
 @media (prefers-reduced-motion:reduce){:root{--dur-fast:1ms;--dur:1ms;--dur-slow:1ms}}
