@@ -204,3 +204,6 @@ Object.assign(window.I18N_DE, {
 });
 // design standard: film grain and the buttons' new words
 Object.assign(window.I18N_DE, { 'Film grain': 'Filmkorn', 'A fine grain over the background, like film.': 'Ein feines Korn über dem Hintergrund, wie bei Film.', 'Off': 'Aus', 'On': 'An' });
+// the dyslexia font
+Object.assign(window.I18N_DE, { 'Dyslexia-friendly': 'Für Legasthenie', 'Accessibility': 'Barrierefreiheit', 'A font for dyslexia': 'Eine Schrift für Legasthenie',
+  "OpenDyslexic, with a little more space between lines and words. Its letters have heavier bottoms, so they don't flip or swap.": 'OpenDyslexic, mit etwas mehr Abstand zwischen Zeilen und Wörtern. Die Buchstaben sind unten schwerer, damit sie nicht kippen oder sich vertauschen.' });

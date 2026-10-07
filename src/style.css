@@ -797,3 +797,9 @@ body.playing .tb.big{animation:none}
 
 /* the version under the big logos (the empty canvas, the setup) */
 .appver{display:block;text-align:center;font:600 12px/1 var(--font-ui,inherit);letter-spacing:.1em;color:var(--ink-3,var(--muted));margin:-2px 0 8px}
+
+/* the dyslexia font set: a little more room between lines and words */
+html.dysfont body{line-height:1.55;letter-spacing:.01em;word-spacing:.06em}
+/* tours and dialogs never touch the window's edge: 12px of room at any size, and they scroll inside when the window is short */
+.tour-bub{box-sizing:border-box;width:min(360px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}.tour-bub.wide{width:min(520px,calc(100vw - 24px))}
+.modal .card{box-sizing:border-box;max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);overflow:auto}

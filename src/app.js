@@ -1873,7 +1873,7 @@ function appearance() {
     h('div', { class: 'seg' }, ...[[0, 'Off'], [1, 'On']].map(([v, l]) => h('button', { type: 'button', icon: 'grain', class: (t.grain ?? 1) === v ? 'on' : '', text: l, onclick: () => set({ grain: v }) }))),
     h('div', { class: 'sec', icon: 'font', text: 'Fonts' }),
     h('div', { class: 'fontsets', role: 'radiogroup', 'aria-label': 'Fonts' }, ...FONT_SETS.map(([n, d, u]) => {
-      const on = (t.fonts || 'Easy reading') === n, b = h('button', { type: 'button', role: 'radio', 'aria-checked': String(on), class: 'fontset' + (on ? ' on' : ''), onclick: () => set({ fonts: n }) },
+      const on = (t.fonts || 'Easy reading') === n, b = h('button', { type: 'button', role: 'radio', 'aria-checked': String(on), class: 'fontset' + (on ? ' on' : ''), onclick: () => set(n === DYS_SET && t.fonts !== DYS_SET ? { fonts: n, fontsBefore: t.fonts || 'Easy reading' } : { fonts: n }) },
         h('small', { text: n }), h('b', { text: 'The dragon rolls a 20' }), h('span', { text: d === u ? d : `${d} + ${u}` }));
       applyFontSet(b, n); return b;
     })),
@@ -2274,7 +2274,7 @@ async function settings() {
   if (document.querySelector('.modal')) return;
   closeMenu();
   const s = S(), dir = await desk.csDir().catch(() => ({ dir: '' })), upd = desk.updates ? await desk.updates.get().catch(() => null) : null;
-  const SETSEC = { General: 'gear', Sound: 'sliders', Folders: 'folder', Connection: 'link', 'Tips and help': 'help', Reset: 'refresh' };
+  const SETSEC = { General: 'gear', Accessibility: 'font', Sound: 'sliders', Folders: 'folder', Connection: 'link', 'Tips and help': 'help', Reset: 'refresh' };
   const sec = (title, ...kids) => h('section', { class: 'setsec' }, h('div', { class: 'sec', icon: SETSEC[title] || 'sliders', text: title }), ...kids);
   const chk = (label, sub, get, set) => h('label', { class: 'setchk' }, h('input', { type: 'checkbox', checked: !!get(), onchange: e => { set(e.target.checked); save(); } }), h('span', {}, h('b', { text: label }), sub ? h('small', { text: sub }) : null));
   const slider = (label, key, min, max, stepv, show) => h('div', { class: 'sl' }, h('span', { text: label }),
@@ -2290,6 +2290,10 @@ async function settings() {
         chk('Connect to the last table on start', 'Uses the music code from last time.', () => s.autoConnect !== false, v => { s.autoConnect = v; }),
         chk('Ask before quitting while something plays', '', () => s.confirmQuit !== false, v => { s.confirmQuit = v; }),
         chk('Media keys work even when the app is in the background', 'Play, pause, next, previous and stop on the keyboard.', () => s.mediaKeys !== false, v => { s.mediaKeys = v; desk.mediaKeys(v); })),
+      sec('Accessibility',
+        chk('A font for dyslexia', "OpenDyslexic, with a little more space between lines and words. Its letters have heavier bottoms, so they don't flip or swap.",
+          () => (s.theme || {}).fonts === DYS_SET,
+          v => { const t = s.theme || (s.theme = { ...DEF().theme }); if (v) { if (t.fonts !== DYS_SET) t.fontsBefore = t.fonts || 'Easy reading'; t.fonts = DYS_SET; } else t.fonts = t.fontsBefore && t.fontsBefore !== DYS_SET ? t.fontsBefore : 'Easy reading'; applyTheme(); })),
       sec('Sound',
         slider('Music dips under pads to', 'duck', 0, 1, 0.05, v => Math.round(v * 100) + '%'),
         slider('Pause fade', 'pauseFade', 0, 5, 0.1, v => v.toFixed(1) + 's'),

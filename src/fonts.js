@@ -12,8 +12,10 @@ const FONT_SETS = [
   ['Pulp', 'Texturina', 'Rubik', 'Spectral'],
   ['Neon', 'Unbounded', 'Onest', 'Atkinson Hyperlegible Next'],
   ['Jolly Roger', 'Pirata One', 'Outfit', 'Alegreya'],
-  ['Studio', 'Syne', 'Bricolage Grotesque', 'Newsreader']
+  ['Studio', 'Syne', 'Bricolage Grotesque', 'Newsreader'],
+  ['Dyslexia-friendly', 'OpenDyslexic', 'OpenDyslexic', 'OpenDyslexic']
 ];
+const DYS_SET = 'Dyslexia-friendly';
 // each face: its Google Fonts query ('' = bundled), serif or sans, and the weight titles use
 const FONT_FACES = {
   'Atkinson Hyperlegible Next': ['', 'sans', 750], 'Zalando Sans Expanded': ['Zalando+Sans+Expanded:wght@200..900', 'sans', 700],
@@ -27,6 +29,12 @@ const FONT_FACES = {
   'Syne': ['Syne:wght@400..800', 'sans', 750], 'Bricolage Grotesque': ['Bricolage+Grotesque:opsz,wght@12..96,300..800', 'sans', 750]
 };
 function fontStack(name) {
+  // OpenDyslexic comes from Fontsource (400 and 700), with Lexend from Google Fonts while it loads or offline
+  if (name === 'OpenDyslexic') {
+    for (const u of ['https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5/index.css', 'https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5/700.css', 'https://fonts.googleapis.com/css2?family=Lexend:wght@300..800&display=swap'])
+      if (!document.querySelector(`link[data-font="${u}"]`)) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.dataset.font = u; l.href = u; document.head.append(l); }
+    return "'OpenDyslexic','Lexend',sans-serif";
+  }
   const f = FONT_FACES[name] || FONT_FACES['Atkinson Hyperlegible Next'];
   if (f[0] && !document.querySelector(`link[data-font="${f[0]}"]`)) {
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.dataset.font = f[0];
@@ -40,4 +48,6 @@ function applyFontSet(el, name) {
   const [, d, u, r] = fontSet(name), st = el.style;
   st.setProperty('--font-display', fontStack(d)); st.setProperty('--fw-display', (FONT_FACES[d] || [0, 0, 750])[2]);
   st.setProperty('--font-ui', fontStack(u)); st.setProperty('--font-read', fontStack(r));
+  // the dyslexia set also opens up the lines and words, for the whole page
+  if (el === document.documentElement) el.classList.toggle('dysfont', name === DYS_SET);
 }

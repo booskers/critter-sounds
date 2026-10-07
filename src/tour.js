@@ -70,11 +70,14 @@
     if (cur !== T) return;
     const s = T.steps[T.i], el = target(s), b = T.bub, pad = s.pad ?? 6;
     const vw = innerWidth, vh = innerHeight, bw = b.offsetWidth, bh = b.offsetHeight;
-    if (!el) { T.spot.hidden = true; b.classList.add('center'); b.style.left = Math.round((vw - bw) / 2) + 'px'; b.style.top = Math.round((vh - bh) / 2) + 'px'; document.body.classList.add('touring-dim'); return; }
+    // nothing a tour shows ever touches the window's edge: cards and spotlights stay at least M px inside, at any size
+    const M = 12, fit = (v, lo, hi) => Math.round(Math.max(lo, Math.min(hi, v)));
+    if (!el) { T.spot.hidden = true; b.classList.add('center'); b.style.left = fit((vw - bw) / 2, M, vw - bw - M) + 'px'; b.style.top = fit((vh - bh) / 2, M, vh - bh - M) + 'px'; document.body.classList.add('touring-dim'); return; }
     document.body.classList.remove('touring-dim'); b.classList.remove('center');
     const r = el.getBoundingClientRect(), sp = T.spot;
     sp.hidden = false;
-    Object.assign(sp.style, { left: r.left - pad + 'px', top: r.top - pad + 'px', width: r.width + pad * 2 + 'px', height: r.height + pad * 2 + 'px' });
+    const E = M + 3, sl = fit(r.left - pad, E, vw - E), st = fit(r.top - pad, E, vh - E), sr = fit(r.right + pad, sl, vw - E), sb = fit(r.bottom + pad, st, vh - E); // +3: the ring around the spot
+    Object.assign(sp.style, { left: sl + 'px', top: st + 'px', width: sr - sl + 'px', height: sb - st + 'px' });
     // the bubble goes where there's room: below, above, right, left, or over the middle of a big target
     const gap = 14, cands = [
       [r.left + r.width / 2 - bw / 2, r.bottom + pad + gap, vh - r.bottom - pad - gap >= bh],
@@ -83,8 +86,8 @@
       [r.left - pad - gap - bw, r.top + r.height / 2 - bh / 2, r.left - pad - gap >= bw]
     ];
     const c = s.side === 'left' ? cands[3] : s.side === 'right' ? cands[2] : s.side === 'top' ? cands[1] : cands.find(x => x[2]) || [r.left + r.width / 2 - bw / 2, r.top + Math.min(r.height - bh, 40), true];
-    b.style.left = Math.round(Math.min(vw - bw - 10, Math.max(10, c[0]))) + 'px';
-    b.style.top = Math.round(Math.min(vh - bh - 10, Math.max(10, c[1]))) + 'px';
+    b.style.left = fit(c[0], M, vw - bw - M) + 'px';
+    b.style.top = fit(c[1], M, vh - bh - M) + 'px';
   }
   function end(finished) {
     const T = cur; if (!T) return;
