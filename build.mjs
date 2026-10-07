@@ -45,6 +45,8 @@ await copyFile(join(shared, 'musicfx.js'), join(out, 'musicfx.js'));
 // the player, and the soundscape editor that opens in a window of its own
 for (const f of [...(WEB ? ['desk-web.js', 'manifest.webmanifest', 'app-icon.png', 'apple-touch-icon.png', 'favicon.svg'] : []), 'desk-boot.js', 'lan.js', 'mobile.js', 'style.css', 'app.js', 'fxpresets.js', 'scape.js', 'scape.html', 'scape-editor.js', 'scape.css', 'pcmtap.js', 'tour.js', 'i18n.js', 'i18n-de.js', 'i18n-de2.js', 'i18n-de3.js', 'notes-bridge.js', 'fonts.js',
   'atkinson-latin.woff2', 'atkinson-latin-ext.woff2', 'atkinson-italic-latin.woff2', 'atkinson-italic-latin-ext.woff2', 'OFL-Atkinson-Hyperlegible-Next.txt']) await copyFile(join(here, 'src', f), join(out, f));
+// the QR code for pairing a phone (qrcode-generator, MIT, by Kazuhiko Arase)
+await copyFile(join(here, 'node_modules', 'qrcode-generator', 'qrcode.js'), join(out, 'qrcode.js'));
 // the Critter Sounds logo (src/logo.svg) in the header, and its emblem (src/icon.svg, made by make-icons.cjs) in the title bar
 const logo = (await readFile(join(here, 'src', 'logo.svg'), 'utf8')).replace(/^[\s\S]*?(<svg)/, '$1').replace(/<svg[^>]*?viewBox="([^"]+)"[^>]*>/, (m, vb) => `<svg class="logo-svg" viewBox="${vb}" role="img" aria-label="Critter Sounds">`);
 await copyFile(join(here, 'src', 'icon.svg'), join(out, 'icon.svg'));

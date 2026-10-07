@@ -1028,3 +1028,6 @@ body.web{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 }
 /* on a phone the bar says only who it controls (the rest is in Settings and Help) */
 .mlan .lanwhy{display:none}.mlan .lanbar .grow{font-size:14.5px}
+/* pairing: the QR code beside the code */
+.lanpair{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.lanpair .lancode{flex:1;min-width:140px}
+.lanqr{width:148px;height:148px;flex:none;padding:8px;border-radius:14px;background:#fff;box-sizing:border-box}.lanqr svg{display:block;width:100%;height:100%}

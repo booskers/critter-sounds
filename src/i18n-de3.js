@@ -89,3 +89,17 @@ Object.assign(window.I18N_DE, {
   [/^Now playing: (.+)\. Open the player$/, 'Läuft gerade: $1. Player öffnen'],
   [/^(\d+) sound pads? playing$/, '$1 Sound-Pads spielen']
 );
+// remembered devices and pairing by QR code
+Object.assign(window.I18N_DE, {
+  'Remembered · not open right now': 'Gemerkt · gerade nicht geöffnet',
+  'For a computer you haven\'t controlled yet': 'Für einen Computer, den du noch nicht gesteuert hast',
+  'When a device doesn\'t show up here: once is enough': 'Wenn ein Gerät hier nicht auftaucht: einmal reicht',
+  'Forget remembered computers': 'Gemerkte Computer vergessen',
+  'Forgot the remembered computers.': 'Die gemerkten Computer sind vergessen.',
+  'Forget devices that controlled this one': 'Geräte vergessen, die diesen hier gesteuert haben',
+  'They have to pair again before they find this computer by themselves': 'Sie müssen sich neu koppeln, bevor sie diesen Computer von selbst finden',
+  'Devices that controlled this one have to pair again.': 'Geräte, die diesen hier gesteuert haben, müssen sich neu koppeln.',
+  'Scan the QR code with your phone\'s camera, or enter one device\'s code on the other. Once a device has controlled this one, they find each other by themselves after that. They still connect only over your local network, so both must be on it.': 'Scanne den QR-Code mit der Kamera deines Handys, oder gib den Code des einen Geräts auf dem anderen ein. Hat ein Gerät dieses hier einmal gesteuert, finden sich die beiden danach von selbst. Sie verbinden sich trotzdem nur über dein lokales Netzwerk, also müssen beide darin sein.',
+  'Paired: looking for the other device…': 'Gekoppelt: suche das andere Gerät…'
+});
+Object.assign(window.I18N_DE, { 'QR Code Generator': 'QR Code Generator', 'by Kazuhiko Arase, for the pairing QR code (MIT).': 'von Kazuhiko Arase, für den QR-Code zum Koppeln (MIT).' });

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1 (2026-10-07)
+- Nearby finds your computer by itself after the first time: once a phone, tablet or browser has controlled it (and you pressed Allow), the two find each other again even when your network doesn't show them as neighbours.
+- Pair by QR code: scan it with the phone's camera instead of typing the code.
+- Remembered computers show in Nearby, and can be forgotten in Settings.
+
 ## 1.4.0 (2026-10-07)
 - Nearby: Critter Sounds finds the others on your network. A phone, tablet or another computer can control this one: you see who's asking and a code to check, and nothing happens until you press Allow.
 - While it's controlled, sounds play here and downloads are saved here; the two talk directly over your network, never through the internet.

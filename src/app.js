@@ -2163,6 +2163,7 @@ function panelHelp(body) {
       ty('Fluxer', 'https://fluxer.app', 'and fluxer.js, with LiveKit\'s rtc-node, for the Fluxer bot.'),
       ty('opusscript, prism-media and @noble/ciphers', 'https://github.com/abalabahaha/opusscript', 'for encoding and encrypting the voice stream without anything to compile.'),
       ty('Electron', 'https://www.electronjs.org', 'and Chromium, whose Web Audio and WebRTC carry every sound to the table.'),
+      ty('QR Code Generator', 'https://github.com/kazuhikoarase/qrcode-generator', 'by Kazuhiko Arase, for the pairing QR code (MIT).'),
       ty('Cloudflare Workers', 'https://workers.cloudflare.com', 'for running Homebase, which connects this app to Critter VTT.'),
       h('li', { text: 'Critter VTT, the table this app plays to, and everyone who plays at it.' }))));
 }

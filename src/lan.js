@@ -22,7 +22,7 @@
   const rnd = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('');
   const LAN = window.LAN = {
     ws: null, open: false, me: 'p' + rnd(12), rooms: new Map(), backoff: 1000, t: 0,
-    pair: '', pairT: 0, joined: new Set(),
+    pair: '', pairT: 0, joined: new Set(), home: '', homeRoom: '', known: [],
     ctl: null,   // the desktop this one controls: { peer, name, pc, dc }
     host: null,  // the device controlling this one
     asking: null, prompts: new Map(), lastSig: '', name: ''
@@ -53,6 +53,44 @@
   const raw = m => { if (LAN.open) try { LAN.ws.send(JSON.stringify(m)); } catch {} };
   const presence = () => ({ app: 'critter-sounds', name: deskName(), kind: KIND, v: window.APP_VERSION || '', busy: !!(LAN.ctl || LAN.host) });
   function join(room) { if (room !== 'lan') LAN.joined.add(room); raw({ t: 'join', room, peer: LAN.me, presence: presence() }); }
+  function leave(room) { LAN.joined.delete(room); LAN.rooms.delete(room); raw({ t: 'leave', room }); paintLan(); }
+
+  /* ---------- remembered devices: found again wherever they are ----------
+     Grouping by network fails when one device reaches Homebase from another address than the other: iCloud Private
+     Relay, mobile data, or IPv6 on one and not the other. So each desktop app keeps a private home key and always sits
+     in a room named after its hash. A device that controlled it once (after someone pressed Allow there) is handed the
+     key over the direct connection and remembers it; from then on both join that room and find each other by
+     themselves. Controlling still only works on the same network, and still needs Allow every time. */
+  const sha = async s => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, '0')).join('');
+  const roomOf = async k => 'csh-' + (await sha('critter-sounds-home|' + k)).slice(0, 32);
+  const MAX_KNOWN = 5;   // Homebase lets a connection sit in 8 rooms: lan, its own home, a pairing code, and these
+  async function homeRooms() {
+    if (!ON_WEB) {
+      let k = ''; try { k = localStorage.getItem('cs.home') || ''; if (k.length < 16) { k = rnd(24); localStorage.setItem('cs.home', k); } } catch { k = rnd(24); }
+      LAN.home = k; LAN.homeRoom = await roomOf(k); LAN.joined.add(LAN.homeRoom);
+    }
+    try { LAN.known = JSON.parse(localStorage.getItem('cs.known') || '[]').filter(x => x && typeof x.k === 'string' && x.k.length >= 16).slice(0, MAX_KNOWN); } catch { LAN.known = []; }
+    for (const x of LAN.known) { x.room = await roomOf(x.k); LAN.joined.add(x.room); }
+  }
+  const saveKnown = () => { try { localStorage.setItem('cs.known', JSON.stringify(LAN.known.map(({ k, n, t }) => ({ k, n, t })))); } catch {} };
+  async function remember(k, n) {
+    if (typeof k !== 'string' || k.length < 16 || k.length > 64 || k === LAN.home) return;
+    const room = await roomOf(k), i = LAN.known.findIndex(x => x.k === k);
+    if (i >= 0) LAN.known.splice(i, 1);
+    LAN.known.unshift({ k, n: String(n || 'Critter Sounds').slice(0, 40), t: Date.now(), room });
+    for (const d of LAN.known.splice(MAX_KNOWN)) leave(d.room);
+    saveKnown(); if (!LAN.joined.has(room)) join(room);
+  }
+  function forgetKnown() { for (const x of LAN.known) leave(x.room); LAN.known = []; saveKnown(); toast('Forgot the remembered computers.'); }
+  // a desktop app forgets everyone it handed its key to: a new key, a new room
+  async function newHome() {
+    if (ON_WEB) return;
+    if (LAN.homeRoom) leave(LAN.homeRoom);
+    try { localStorage.removeItem('cs.home'); } catch {}
+    LAN.known.forEach(x => LAN.joined.add(x.room));
+    await homeRooms(); join(LAN.homeRoom);
+    toast('Devices that controlled this one have to pair again.');
+  }
   function announce() { for (const r of LAN.rooms.keys()) raw({ t: 'presence', room: r, peer: LAN.me, presence: presence() }); }
   // to one device; the room is wherever it was seen
   function signal(peer, topic, data) {
@@ -248,6 +286,8 @@
     LAN.lastSig = '';
     sendLib(X);
     X.send({ t: 'scapes', list: SC.list });
+    // the key to this computer's room: the other device finds it again by itself next time, wherever it is
+    if (LAN.home) X.send({ t: 'home', k: LAN.home, n: deskName() });
     document.body.classList.add('lanhost'); remoteBar(); announce();
     toast(X.name + ' is controlling this Critter Sounds now.');
   }
@@ -333,6 +373,7 @@
       else if (m.t === 'st' && LAN.ctl === X) mirror(m.st);
       else if (m.t === 'scapes' && LAN.ctl === X) { SC.list = Array.isArray(m.list) ? m.list : []; SC.loaded = true; renderPanels('scapes'); }
       else if (m.t === 'yt' && typeof ytProgress === 'function') ytProgress(m.p);
+      else if (m.t === 'home') remember(m.k, m.n);
       else if (m.t === 'bye') X.end(X.name + ' ended the remote control.');
     });
     // nothing plays here any more: it all plays over there
@@ -392,10 +433,13 @@
           sub: mine ? 'You control it now' : pr.busy ? (desktop ? 'Desktop app · busy with a remote control' : 'In a browser · busy') : desktop ? 'Desktop app · control it from here' : 'In a browser · it can control this one',
           disabled: !desktop || (pr.busy && !mine) || !!X, fn: () => askControl(p) };
       }),
-      list.length ? null : { label: 'Nothing nearby yet', sub: 'Open Critter Sounds on another device on this network', icon: 'search', disabled: true },
+      // remembered computers that aren't open right now
+      ...LAN.known.filter(x => !(LAN.rooms.get(x.room) || []).length).map(x => ({ label: x.n, icon: 'window', sub: 'Remembered · not open right now', disabled: true })),
+      list.length || LAN.known.length ? null : { label: 'Nothing nearby yet', sub: 'Open Critter Sounds on another device on this network', icon: 'search', disabled: true },
       '-',
       X ? { label: 'End remote control', icon: 'x', fn: () => X.end() } : null,
-      { label: 'Pair with a code…', sub: 'When a device doesn\'t show up here', icon: 'link', fn: pairDialog },
+      { label: 'Pair with a code…', sub: LAN.known.length ? 'For a computer you haven\'t controlled yet' : 'When a device doesn\'t show up here: once is enough', icon: 'link', fn: pairDialog },
+      LAN.known.length ? { label: 'Forget remembered computers', icon: 'trash', fn: forgetKnown } : null,
       { label: 'This device: ' + deskName(), sub: 'Rename it in Settings', icon: 'edit', fn: () => settings() }
     ]);
   }
@@ -404,6 +448,10 @@
     if (!LAN.open) { toast('Not connected to Homebase yet: try again in a moment.'); return; }
     if (!LAN.pair) { LAN.pair = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1e6).padStart(6, '0'); join('csp-' + LAN.pair); }
     const inp = h('input', { type: 'text', inputMode: 'numeric', maxLength: 7, placeholder: '123 456', class: 'notr', 'aria-label': 'The other device\'s code' });
+    // the same code as a link, and as a QR code the phone's camera opens straight into the web version
+    const link = 'https://sounds.crittervtt.com/#pair=' + LAN.pair;
+    let qr = null;
+    try { const q = qrcode(0, 'M'); q.addData(link); q.make(); qr = h('div', { class: 'lanqr', role: 'img', 'aria-label': 'QR code for ' + link }); qr.innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch {}
     const box = h('div', { class: 'modal lanm', onpointerdown: e => { if (e.target === box) box.remove(); } }, h('form', { class: 'card appear', onsubmit: e => {
       e.preventDefault(); const c = inp.value.replace(/\D/g, '');
       if (c.length !== 6) { inp.focus(); return; }
@@ -412,9 +460,9 @@
       setTimeout(() => { if (nearby().length) lanMenu($('#lanBtn')); }, 1500);
     } },
       h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('link')), h('b', { class: 'grow', text: 'Pair with a code' }), h('button', { type: 'button', class: 'ib', text: '✕', title: 'Close', onclick: () => box.remove() })),
-      h('p', { class: 'hint', text: 'Enter one device\'s code on the other. They still connect only over your local network, so both must be on it.' }),
+      h('p', { class: 'hint', text: 'Scan the QR code with your phone\'s camera, or enter one device\'s code on the other. Once a device has controlled this one, they find each other by themselves after that. They still connect only over your local network, so both must be on it.' }),
       h('div', { class: 'sec', icon: 'window', text: 'This device\'s code' }),
-      h('div', { class: 'lancode notr', text: LAN.pair.slice(0, 3) + ' ' + LAN.pair.slice(3) }),
+      h('div', { class: 'lanpair' }, qr, h('div', { class: 'lancode notr', text: LAN.pair.slice(0, 3) + ' ' + LAN.pair.slice(3) })),
       h('div', { class: 'sec', icon: 'link', text: 'The other device\'s code' }),
       h('div', { class: 'row' }, inp, h('button', { type: 'submit', class: 'btn primary', text: '🔗 Pair' }))));
     document.body.append(box); inp.focus();
@@ -425,7 +473,9 @@
     h('div', { class: 'setrow' }, h('span', { text: 'This device\'s name' }), h('input', { type: 'text', value: S().deviceName || '', maxLength: 40, placeholder: LAN.name || 'Critter Sounds', oninput: e => { S().deviceName = e.target.value.trim(); save(); clearTimeout(LAN.nameT); LAN.nameT = setTimeout(announce, 600); } })),
     h('label', { class: 'setchk' }, h('input', { type: 'checkbox', checked: S().lanFind !== false, onchange: e => { S().lanFind = e.target.checked; save(); if (e.target.checked) lanStart(); else { (LAN.ctl || LAN.host)?.end(); lanStop(); } } }),
       h('span', {}, h('b', { text: 'Find Critter Sounds on this network' }), h('small', { text: ON_WEB ? 'So you can control a Critter Sounds desktop app from here. Others nearby see this device\'s name.' : 'So a phone, tablet or another computer can control this one: you always confirm first. Others nearby see this device\'s name.' }))),
-    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn tiny', text: '🔗 Pair with a code…', onclick: () => { document.querySelector('.modal')?.remove(); pairDialog(); } }))
+    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn tiny', text: '🔗 Pair with a code…', onclick: () => { document.querySelector('.modal')?.remove(); pairDialog(); } }),
+      LAN.known.length ? h('button', { type: 'button', class: 'btn tiny ghost', text: '🗑 Forget remembered computers', onclick: forgetKnown }) : null,
+      ON_WEB ? null : h('button', { type: 'button', class: 'btn tiny ghost', text: '⟳ Forget devices that controlled this one', title: 'They have to pair again before they find this computer by themselves', onclick: newHome }))
   ];
   window.lanMenu = lanMenu;
   (async () => {
@@ -435,7 +485,15 @@
     paintLan();
     // after the library has loaded (and Homebase has made this device's key)
     for (let i = 0; i < 50 && !localStorage.getItem('hb.key'); i++) await sleep(200);
+    await homeRooms();
     lanStart();
+    // opened from a pairing QR code or link (sounds.crittervtt.com/#pair=123456): pair with that device straight away
+    const pm = /(?:^|[#&])pair=(\d{6})\b/.exec(location.hash);
+    if (pm) {
+      try { history.replaceState(history.state, '', location.pathname + location.search); } catch {}
+      for (let i = 0; i < 50 && !LAN.open; i++) await sleep(200);
+      if (LAN.open) { join('csp-' + pm[1]); toast('Paired: looking for the other device…'); for (let i = 0; i < 15 && !nearby().length; i++) await sleep(200); if (nearby().length) lanMenu($('#lanBtn')); }
+    }
   })();
   addEventListener('beforeunload', () => { (LAN.ctl || LAN.host)?.end('', true); });
 })();
