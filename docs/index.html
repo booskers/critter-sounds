@@ -4,168 +4,123 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Critter Sounds</title>
-<meta name="description" content="Critter Sounds plays music, sound pads and soundscapes live to your tabletop group: in Critter, or in a Discord or Fluxer voice channel.">
+<meta name="description" content="Critter Sounds plays music, sound pads and soundscapes live to your tabletop group: in Critter VTT, or in a Discord or Fluxer voice channel.">
 <meta property="og:title" content="Critter Sounds">
-<meta property="og:description" content="Music, sound effects and ambience for your tabletop game, played live to the table.">
-<meta property="og:image" content="img/sounds-game.png">
-<link rel="icon" href="img/sounds-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Grenze:wght@600;700&display=swap">
-<link rel="stylesheet" href="style.css">
-<style>
-.hero::before{background:radial-gradient(closest-side at 50% 50%,rgba(136,0,255,.28),transparent)}
-.logos img{height:88px}
-nav .brand img{height:32px}
-</style>
+<meta property="og:description" content="Critter Sounds plays music, sound pads and soundscapes live to your tabletop group: in Critter VTT, or in a Discord or Fluxer voice channel.">
+<meta property="og:image" content="https://booskers.github.io/critter-sounds/img/sounds-main.jpg">
+<meta name="theme-color" content="#0c0d10">
+<link rel="icon" href="img/icon-sounds.png">
+<link rel="stylesheet" href="site.css">
+<style>:root{--accent:#8800ff;--accent-2:#4cc9f0;}</style>
 </head>
-<body class="sounds">
-
-<nav>
-  <a class="promo to-critter" href="https://booskers.github.io/critter/">
-    <div class="wrap">
-      <span class="lbl">Check out also:</span>
-      <img src="img/critter-icon.png" alt="">
-      <b>Critter</b>
-      <span class="what">the free virtual tabletop it plays to, in your browser or on Windows</span>
-      <span class="go">Take a look →</span>
-    </div>
-  </a>
+<body>
+<header>
+<div class="promo"><div class="wrap"><span class="lbl">Check out also:</span><a href="https://booskers.github.io/crittervtt/" style="--c:#ff5c00"><img src="img/icon-vtt.png" alt=""><b>Critter VTT</b><span class="what">the free virtual tabletop</span></a><a href="https://booskers.github.io/critter-notes/" style="--c:#ffbd00"><img src="img/icon-notes.png" alt=""><b>Critter Notes</b><span class="what">your campaign, planned and ready to run</span></a></div></div>
+<nav class="top" aria-label="Critter Sounds">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="Critter Sounds home"><img src="img/sounds-logo.svg" alt="Critter Sounds"></a>
-    <div class="links">
-      <a href="#features" class="hide-s">Features</a>
-      <a href="#library" class="hide-s">Library</a>
-      <a href="#download">Download</a>
-      <a href="https://github.com/booskers/critter-sounds">GitHub</a>
-    </div>
+    <a class="brand" href="#top" aria-label="Critter Sounds home"><img src="img/logo-sounds.svg" alt="Critter Sounds"></a>
+    <div class="links"><a href="#features" class="hide-s">Features</a><a href="#scapes" class="hide-s">Soundscapes</a><a href="#library">Library</a><a href="#download">Download</a><a href="https://github.com/booskers/critter-sounds">GitHub</a></div>
   </div>
 </nav>
-
-<header class="hero" id="top">
-  <div class="wrap">
-    <div class="logos"><img src="img/sounds-logo.svg" alt="Critter Sounds"></div>
-    <h1>The soundtrack to your game,<br>played <span class="p">live</span>.</h1>
-    <p class="lede">Music, sound effects and ambience for your tabletop game, played from your computer to everyone at the table: in Critter, or in a Discord or Fluxer voice channel.</p>
-    <div class="ctas">
-      <a class="btn purple" href="https://github.com/booskers/critter-sounds/releases/latest/download/Critter-Sounds-Setup.exe">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
-        Download for Windows</a>
-      <a class="btn ghost" href="#how">How it connects</a>
-    </div>
-    <p class="note">Free and open source. Windows 10 and 11.</p>
-    <div class="shot">
-      <img src="img/sounds-game.png" alt="Critter Sounds: playlists, sound pads, soundscapes, scenes and effects side by side" width="1280" height="820">
-    </div>
-  </div>
 </header>
+<main>
+<section class="hero" id="top">
+  <div class="wrap">
+    <img class="logo" src="img/logo-sounds.svg" alt="Critter Sounds">
+    <h1>The soundtrack to your game, <em>played live.</em></h1>
+    <p class="lede">Music, sound effects and ambience for your tabletop game, played from your computer to everyone at the table: in Critter VTT, or in a Discord or Fluxer voice channel.</p>
+    <div class="ctas"><a class="btn primary" href="https://github.com/booskers/critter-sounds/releases/latest/download/Critter-Sounds-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg> Download for Windows</a><a class="btn " href="#how"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg> How it connects</a></div>
+    <p class="note">Free and open source. Windows 10 and 11.</p>
+    <figure class="shot"><img src="img/sounds-main.jpg" alt="Critter Sounds connected to a table, playing The Drowned King with the Cave effect, with playlists, sound pads, soundscapes, scenes and the queue" width="2559" height="1404"><figcaption>Connected to the table and heard by all four seats: a dungeon playlist with the Cave effect, rain looping on a pad, and the next tracks queued.</figcaption></figure>
+  </div>
+</section>
 
 <section id="features">
   <div class="wrap">
     <div class="split">
       <div>
-        <span class="eyebrow purple-t"><img src="img/sounds-icon.png" alt="">Features</span>
+        <span class="eyebrow">Running the music</span>
         <h2>Everything the music needs.</h2>
-        <p class="sub">It plays from your computer and streams to every player, so there's nothing to upload and no limit on tracks.</p>
-        <ul class="ticks">
-          <li><b>Playlists from your folders</b>, a queue, fades and crossfades.</li>
-          <li><b>Sound pads</b> with automatic icons and tags; keys 1 to 9 play them and the music dips underneath.</li>
-          <li><b>Soundscapes:</b> a node editor for living backgrounds, like rain that comes and goes, rendered to seamless loops.</li>
-          <li><b>Effects</b> such as Tavern next door, Underwater, Cave and Old gramophone, applied on each player's side.</li>
-          <li><b>Discord and Fluxer bots</b> that play the same mix in a voice channel.</li>
-          <li><b>YouTube and web pages:</b> keep just the sound of a video, or send any page's audio to the table.</li>
-        </ul>
+        <p class="sub">It plays from your computer and streams to every player over WebRTC, so there’s nothing to upload and no limit on tracks.</p>
+        <ul class="ticks"><li><b>Playlists</b> from your folders, with a queue, fades and crossfades.</li><li><b>Sound pads</b> that pick their own icon and tag from the name; keys 1 to 9 play them, and the music dips underneath.</li><li><b>Scenes</b> that remember a playlist with its effects and volume, and crossfade into it.</li><li><b>Effects</b> such as Tavern next door, Underwater, Cave and Boss fight, applied on each player’s side.</li><li><b>Discord and Fluxer bots</b> that play the same mix in a voice channel.</li></ul>
       </div>
-      <div class="media"><img src="img/sounds-welcome.png" alt="The Critter Sounds welcome screen" loading="lazy" width="1280" height="820"></div>
-    </div>
-
-    <div class="grid">
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
-        <h3>Your layout, your way</h3><p>A canvas of windows you split, dock and resize, with ready layouts for running a game or preparing one.</p></div>
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h4a3 3 0 013 3v6"/></svg></div>
-        <h3>Soundscape nodes</h3><p>Noise, samples, LFOs, triggers and effects you patch with cables, and hear change as you edit. Add your own nodes in JavaScript.</p></div>
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h3l3-8 4 16 3-8h7"/></svg></div>
-        <h3>Scenes</h3><p>A playlist plus its effects and volume, started with a crossfade: from the tavern to the fight in one click.</p></div>
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M8 13h8M8 17h5"/></svg></div>
-        <h3>Session log</h3><p>Every track, pad and scene is logged with its time, and appears as small notes in Critter's chat.</p></div>
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg></div>
-        <h3>Even, never louder</h3><p>Effects are loudness-matched, so they never make the music louder than it was. Any player can turn them off.</p></div>
-      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
-        <h3>Guided from the start</h3><p>A short setup, a quick tour and a full tour, and a guided first soundscape that builds the sound of the sea.</p></div>
+      
     </div>
   </div>
 </section>
-
-<section id="library">
+<section id="scapes" class="alt">
   <div class="wrap">
     <div class="split rev">
-      <div class="media"><img src="img/sounds-library.png" alt="The Online library showing Tabletop Audio, Incompetech, Openverse and Freesound" loading="lazy" width="1280" height="820"></div>
       <div>
-        <span class="eyebrow purple-t">Online library</span>
-        <h2>Free music, credited.</h2>
-        <p class="sub">Browse and search free music and sound effects inside the app. Preview it, queue it, make it a pad or save it to play offline. Each track keeps its credit, and players see it.</p>
+        <span class="eyebrow two">Soundscapes</span>
+        <h2>Living backgrounds, built from nodes.</h2>
+        <p class="sub">Patch noise, samples, LFOs and random triggers together: rain that comes and goes, a bell that tolls now and then, a wolf in the distance. Every change is heard as you make it.</p>
+        <ul class="ticks"><li><b>A node editor</b> with sound, control and trigger cables, colour-coded.</li><li><b>Macro sliders</b> like Danger or Intensity show on the soundscape’s tile, to change it while it plays.</li><li><b>Render a loop</b> up to ten minutes long, crossfaded so it loops without a seam.</li><li><b>Your own nodes</b> in a few lines of JavaScript.</li></ul>
       </div>
-    </div>
-    <div class="tablewrap">
-      <table class="lib">
-        <thead><tr><th>Source</th><th>What's there</th><th>License</th></tr></thead>
-        <tbody>
-          <tr><td>Tabletop Audio</td><td>~520 ten-minute ambiences and music</td><td>CC BY-NC-ND 4.0</td></tr>
-          <tr><td>Incompetech</td><td>~1,440 pieces by Kevin MacLeod</td><td>CC BY 4.0</td></tr>
-          <tr><td>Openverse</td><td>Freesound effects, Jamendo, ccMixter, Wikimedia</td><td>Shown on each result</td></tr>
-          <tr><td>Freesound</td><td>600,000+ sound effects (free API key)</td><td>Shown on each result</td></tr>
-        </tbody>
-      </table>
+      <figure class="media"><img src="img/sounds-scape.jpg" alt="The soundscape editor with the Sunken crypt soundscape: noise through a swept filter into a cave reverb, rain, and randomly triggered bell and wolf samples" width="2559" height="1404" loading="lazy"></figure>
     </div>
   </div>
 </section>
-
-<section id="how">
+<section id="library">
   <div class="wrap">
-    <span class="eyebrow" style="color:var(--gold)">How it connects</span>
+    <div class="split">
+      <div>
+        <span class="eyebrow">Online library</span>
+        <h2>Free music, credited.</h2>
+        <p class="sub">Search free music and sound effects inside the app. Preview it, queue it, make it a pad, or save it to play offline. Every track keeps its credit, and players see it.</p>
+        <ul class="ticks"><li><b>Tabletop Audio</b> with about 520 ten-minute ambiences and pieces of music.</li><li><b>Incompetech</b> with about 1,440 pieces by Kevin MacLeod.</li><li><b>Openverse and Freesound</b> for sound effects, each with its license.</li><li><b>YouTube</b> search, keeping only the sound, for what you may use.</li></ul>
+      </div>
+      <figure class="media"><img src="img/sounds-library.jpg" alt="The online library searching Tabletop Audio for tavern ambiences, beside the playlist and sound pads" width="2559" height="1404" loading="lazy"><figcaption>Tavern ambiences from <a href="https://tabletopaudio.com">Tabletop Audio</a> (CC BY-NC-ND 4.0), shown with their credit.</figcaption></figure>
+    </div>
+  </div>
+</section>
+<section id="more">
+  <div class="wrap">
+    <span class="eyebrow">And more</span>
+    <h2>The little things that help.</h2>
+    <div class="grid" style="margin-top:28px"><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><h3>Your layout, your way</h3><p>A canvas of windows you split, dock and resize, with ready layouts for playing and preparing.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></div><h3>Session log</h3><p>Every track, pad and scene is logged with its time, and shows as small notes in Critter VTT’s chat.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h3l3-8 4 16 3-8h7"/></svg></div><h3>Never louder</h3><p>Effects are loudness-matched, so they never make the music louder. Any player can turn them off.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0M12 17v5"/></svg></div><h3>Voice channels</h3><p>A bot of your own joins Discord or Fluxer and plays the table’s mix, effects included.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 11-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div><h3>Updates itself</h3><p>New versions install from inside the app, with what changed.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div><h3>Guided from the start</h3><p>A short setup, a quick and a full tour, and a guided first soundscape.</p></div></div>
+  </div>
+</section>
+
+<section id="how" class="alt">
+  <div class="wrap">
+    <span class="eyebrow two">How it connects</span>
     <h2>One code, and the table hears it.</h2>
-    <p class="sub">Critter Sounds joins your Critter lobby and streams straight to each player over WebRTC. Only an app with the right key can play to your table.</p>
-    <div class="flow">
-      <div class="step"><h3>Open your table</h3><p>Start a lobby in <a href="https://booskers.github.io/critter/">Critter</a>. In the bottom bar, the owner opens <b>Music</b> to find the table's music code.</p></div>
-      <div class="step"><h3>Paste the code</h3><p>Paste it into Critter Sounds and press <b>Connect</b>. The code looks like <span class="code">ABCDEF-KEY12-34567</span>: the lobby, then the key.</p></div>
-      <div class="step"><h3>Play</h3><p>Tracks, pads and soundscapes reach every player with their credits. Each player sets their own volume.</p></div>
-    </div>
-    <p class="small" style="margin-top:20px">Playing in a voice channel instead? Open the <b>Bots</b> window, paste your Discord or Fluxer bot's token and pick a channel.</p>
+    <p class="sub">In Critter VTT, the lobby owner opens <b>Music</b> and copies the table’s music code. Paste it into Critter Sounds and press <b>Connect</b>. Only an app with the right key can play to your table, and each player sets their own volume.</p>
+    <div class="grid"><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7l1.7-1.7"/></svg></div><h3>1. Open your table</h3><p>Start a lobby in <a href="https://booskers.github.io/crittervtt/">Critter VTT</a> and open <b>Music</b> in the bottom bar.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></div><h3>2. Paste the code</h3><p>It looks like <code>ABCDEF-KEY12-34567</code>: the lobby, then the key.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></div><h3>3. Play</h3><p>Tracks, pads and soundscapes reach every player with their credits.</p></div></div>
   </div>
 </section>
-
-<section id="download">
+<section id="family">
   <div class="wrap">
-    <span class="eyebrow" style="color:var(--muted)">Download</span>
+    <span class="eyebrow">The Critter family</span>
+    <h2>Three apps, one table.</h2>
+    <p class="sub">Critter Sounds plays to Critter VTT, the table, and takes its cues from Critter Notes, the GM’s notebook. All three connect through the same Homebase.</p>
+    <div class="family"><a class="fam" href="https://booskers.github.io/crittervtt/" style="--c:#ff5c00"><img class="lg" src="img/logo-vtt.svg" alt="Critter VTT"><p>The free virtual tabletop: battle maps, 3D dice and sheets, in a browser or on Windows.</p><span class="go">Take a look →</span></a><div class="fam here" style="--c:#8800ff"><img class="lg" src="img/logo-sounds.svg" alt="Critter Sounds"><p>Music, sound pads and soundscapes, played live to your table, Discord or Fluxer.</p><span class="here-tag">You’re here</span></div><a class="fam" href="https://booskers.github.io/critter-notes/" style="--c:#ffbd00"><img class="lg" src="img/logo-notes.svg" alt="Critter Notes"><p>Plan sessions, write the world, draw maps and boards, and send it all to the table.</p><span class="go">Take a look →</span></a></div>
+  </div>
+</section>
+<section id="download" class="alt">
+  <div class="wrap">
+    <span class="eyebrow">Download</span>
     <h2>Get Critter Sounds.</h2>
     <div class="dl">
-      <div class="dlcard s">
-        <img class="lg" src="img/sounds-logo.svg" alt="Critter Sounds">
-        <p>For whoever runs the music. Plays from your computer to the table, Discord or Fluxer.</p>
-        <div class="row">
-          <a class="btn purple" href="https://github.com/booskers/critter-sounds/releases/latest/download/Critter-Sounds-Setup.exe">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
-            Critter Sounds for Windows</a>
-        </div>
+      <div class="dlcard main">
+        <img src="img/logo-sounds.svg" alt="Critter Sounds" style="height:44px;width:auto;align-self:flex-start">
+        <p>For whoever runs the music. Plays from your computer to the table, Discord or Fluxer, and updates itself.</p>
+        <div class="row"><a class="btn primary" href="https://github.com/booskers/critter-sounds/releases/latest/download/Critter-Sounds-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg> Critter Sounds for Windows</a></div>
       </div>
-      <div class="dlcard c">
-        <img class="lg" src="img/critter-logo.svg" alt="Critter">
-        <p>The virtual tabletop it plays to. Free, in a browser or on Windows.</p>
-        <div class="row">
-          <a class="btn ghost" href="https://booskers.github.io/critter/">Get Critter</a>
-        </div>
+      <div class="dlcard">
+        <h3>Plays with Critter VTT</h3><p>The virtual tabletop it plays to: free, in a browser or on Windows.</p><div class="row"><a class="btn" href="https://booskers.github.io/crittervtt/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8.7 5v10L12 22l-8.7-5V7z"/><path d="M12 22V12M3.3 7L12 12l8.7-5"/></svg> Get Critter VTT</a></div>
       </div>
     </div>
-    <p class="small" style="margin-top:20px">The installer isn't code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>. Every version is on the <a href="https://github.com/booskers/critter-sounds/releases">Releases page</a>.</p>
+    <p class="small" style="margin-top:20px">The installer isn’t code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>. Every version and what changed is on the <a href="https://github.com/booskers/critter-sounds/releases">Releases page</a>.</p>
   </div>
 </section>
-
+</main>
 <footer>
   <div class="wrap">
-    <div>Critter Sounds · <a href="https://github.com/booskers/critter-sounds">Source on GitHub</a> · MIT License</div>
-    <div>Pad icons from <a href="https://game-icons.net">game-icons.net</a> (CC BY 3.0). Library tracks keep their own licenses.</div>
+    <div>Critter Sounds · Made with love by booskers / Polychrome · <a href="https://github.com/booskers/critter-sounds">Source on GitHub</a> · MIT License</div>
+    <div>Game icons from <a href="https://game-icons.net">game-icons.net</a> (CC BY 3.0) · Font: Atkinson Hyperlegible Next (OFL)</div>
   </div>
 </footer>
-
 </body>
 </html>
