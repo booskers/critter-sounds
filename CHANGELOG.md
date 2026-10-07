@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0 (2026-10-07)
+- Critter Setup, a new installer in the Critter look; updates now download only what changed.
+- A font for dyslexia (OpenDyslexic, with more room between lines and words), as in Critter VTT and Critter Notes.
+- Sound pads, soundscape tiles and the node graph in the shared Critter design.
+- The guided tour keeps every card clear of the window's edge, at any size.
+- The version shows under the logo; the soundscape editor's toolbar starts below the title bar.
+
 ## 1.2.0 (2026-10-07)
 - Updates inside the app: Critter Sounds checks GitHub when it starts (Settings › Updates turns that off), shows the most important changes, and updates with one click.
 - Update now, Later, or Skip this version, with a progress bar for the download and then the installer's own; Critter Sounds opens again by itself.
