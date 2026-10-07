@@ -368,7 +368,7 @@
     const X = LAN.ctl || LAN.host; if (!X) return;
     const bar = h('div', { id: 'lanBar', class: 'lanbar', role: 'status' },
       h('span', { class: 'lanbadge' }, ico('link')),
-      LAN.ctl ? h('span', { class: 'grow' }, h('span', { text: 'Controlling ' }), h('b', { class: 'notr', text: X.name }), h('span', { text: '. Sounds play there, and downloads are saved there.' }))
+      LAN.ctl ? h('span', { class: 'grow' }, h('span', { text: 'Controlling ' }), h('b', { class: 'notr', text: X.name }), h('span', { class: 'lanwhy', text: '. Sounds play there, and downloads are saved there.' }))
         : h('span', { class: 'grow' }, h('b', { class: 'notr', text: X.name }), h('span', { text: ' is controlling this Critter Sounds.' })),
       h('button', { type: 'button', class: 'btn tiny', text: '✕ End remote control', onclick: () => X.end() }));
     $('#top').after(bar);

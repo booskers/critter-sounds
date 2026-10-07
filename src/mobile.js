@@ -59,7 +59,10 @@
     // how far the track is, as a thin line along the mini player
     setInterval(() => { if (!MOB.on) return; const c = E.cur, x = c && c.d && c.d.el, d = x && (isFinite(x.duration) ? x.duration : c.item && c.item.dur); el.prog.style.width = d && E.state !== 'stop' ? Math.min(100, x.currentTime / d * 100) + '%' : '0'; }, 500);
     el.tabs = h('nav', { class: 'mtabs', 'aria-label': 'Sections' }, ...TABS.map(([k, n, ic]) => h('button', { type: 'button', class: 'mtab', 'data-tab': k, onclick: () => tabTap(k) }, ico(ic), h('span', { text: n }))));
-    el.root = h('div', { id: 'mob' }, el.head, el.tools, el.view, el.mini, el.tabs);
+    // while this phone controls a desktop app (or is controlled), lan.js's bar shows under the title
+    el.lan = h('div', { class: 'mlan' });
+    el.root = h('div', { id: 'mob' }, el.head, el.lan, el.tools, el.view, el.mini, el.tabs);
+    new MutationObserver(() => { const b = document.getElementById('lanBar'); if (MOB.on && b && b.parentElement !== el.lan) el.lan.append(b); }).observe(document.body, { childList: true });
     el.conn = $('#conn');
     el.sheetBody = h('div', { class: 'msbody' });
     el.sheet = h('div', { class: 'msheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Now playing', hidden: true },
@@ -69,6 +72,8 @@
     el.scrim = h('div', { class: 'mscrim', hidden: true, onclick: () => history.back() });
     document.body.append(el.root, el.scrim, el.sheet);
     swipeBack(); sheetDrag(); miniSwipe(); rowSwipes();
+    // the cover arrives after it's loaded: the mini player follows it
+    if ($('#nowArt')) new MutationObserver(() => paintMini()).observe($('#nowArt'), { attributes: true, attributeFilter: ['style', 'class'] });
   }
   // the desktop layout's pieces the phone uses too move in while it's a phone, and back when it isn't
   const moved = [];
@@ -436,6 +441,7 @@
       MOB.qo = S().queueOpen; S().queueOpen = true;
       $('#canvas').replaceChildren();
       borrow($('#bar'), el.sheetBody); borrow($('#queue'), el.sheetBody); borrow($('#lanBtn'), el.right);
+      if ($('#lanBar')) el.lan.append($('#lanBar'));
       MOB.stack = []; render(0); paintMini();
     } else renderAll();
   }

@@ -825,9 +825,9 @@ body.lanctl #conn{display:none}
 
 /* ===================== a phone (the web version, 720px wide or less): mobile.js ===================== */
 #mob{display:none}
-body.phone #titlebar,body.phone #top,body.phone #main,body.phone #lanBar{display:none}
+body.phone #titlebar,body.phone #top,body.phone #main,body.phone>#lanBar{display:none}
 body.phone{touch-action:manipulation;-webkit-text-size-adjust:100%}
-body.phone #mob{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);z-index:2}
+body.phone #mob{display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto auto;position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);z-index:2}
 body.phone #mob[hidden]{display:none}
 /* the large title, with Back on the left when there is somewhere to go back to */
 .mhead{display:flex;align-items:center;gap:4px;padding:8px 8px 4px 14px;min-height:52px}
@@ -921,7 +921,8 @@ body.phone.msheet-open .toast{bottom:calc(20px + env(safe-area-inset-bottom))}
 body.phone .modal .card{max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
 @media (prefers-reduced-motion:reduce){.msheet,.mscrim,.mview,.menu.msmenu{transition:none!important;animation:none!important}}
 /* each piece keeps its row, whether or not the tools row shows */
-.mhead{grid-row:1}.mtools{grid-row:2}.mview{grid-row:3}.mmini{grid-row:4}.mtabs{grid-row:5}
+.mhead{grid-row:1}.mlan{grid-row:2}.mtools{grid-row:3}.mview{grid-row:4}.mmini{grid-row:5}.mtabs{grid-row:6}
+.mlan .lanbar{margin:0 14px 8px;padding:6px 6px 6px 10px;font-size:13.5px}.mlan .lanbar .btn{min-height:44px}
 .mright .ib{background:none}
 body.phone #bar .nowart{translate:none;display:grid;place-items:center;align-self:center;justify-self:center;background-color:var(--surface-3,var(--panel2))}
 body.phone #bar .extra select{width:100%}
@@ -1025,3 +1026,5 @@ body.web{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
   /* images and links aren't dragged out of the app */
   body.web :is(img,a,svg){-webkit-user-drag:none}
 }
+/* on a phone the bar says only who it controls (the rest is in Settings and Help) */
+.mlan .lanwhy{display:none}.mlan .lanbar .grow{font-size:14.5px}
