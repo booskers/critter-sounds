@@ -19,7 +19,7 @@ if (process.env.CBM_USERDATA) app.setPath('userData', process.env.CBM_USERDATA);
 else if (!fs.existsSync(path.join(app.getPath('userData'), 'library.json'))) { for (const name of ['Critter Music', 'Critboard Music']) { const old = path.join(app.getPath('appData'), name); if (fs.existsSync(path.join(old, 'library.json'))) { app.setPath('userData', old); break; } } }
 const ICON = path.join(__dirname, 'assets', 'icon.png');
 // updates from the GitHub releases (updater.js): the music stops and the windows close before the installer takes over
-const updates = require('./updater')({ owner: 'booskers', repo: 'critter-sounds', name: 'Critter Sounds', parent: () => win, page: () => win && win.webContents,
+const updates = require('./updater')({ owner: 'booskers', repo: 'critter-sounds', name: 'Critter Sounds', appId: 'app.critboard.music', parent: () => win, page: () => win && win.webContents,
   beforeInstall: () => new Promise(res => { if (!win || win.isDestroyed()) return res(); win.once('closed', res); ipcMain.emit('quit-ok', {}); }) });
 const LIB = () => path.join(app.getPath('userData'), 'library.json');
 // Music\Critter Sounds: downloads, YouTube, soundscapes and their loops (CBM_MUSICDIR=<folder> puts it elsewhere, for testing)

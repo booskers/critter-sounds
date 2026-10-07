@@ -8,7 +8,7 @@
   "scripts": {
     "build-www": "node build.mjs",
     "start": "node build.mjs && electron .",
-    "dist": "node build.mjs && electron-builder --win nsis"
+    "dist": "node build.mjs && electron-builder --win dir && node installer/pack.mjs"
   },
   "build": {
     "appId": "app.critboard.music",
@@ -30,14 +30,8 @@
       "output": "dist"
     },
     "win": {
-      "target": "nsis",
+      "target": "dir",
       "icon": "build/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Critter Sounds",
-      "artifactName": "Critter-Sounds-Setup.${ext}"
     },
     "publish": [
       {
@@ -46,6 +40,16 @@
         "repo": "critter-sounds"
       }
     ]
+  },
+  "critterSetup": {
+    "name": "Critter Sounds",
+    "accent": "#8800ff",
+    "dataDirs": [
+      "Critter Sounds",
+      "Critter Music",
+      "Critboard Music"
+    ],
+    "artifactName": "Critter-Sounds-Setup"
   },
   "devDependencies": {
     "electron": "^44.5.1",
