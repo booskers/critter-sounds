@@ -18,6 +18,9 @@ if (process.env.CBM_USERDATA) app.setPath('userData', process.env.CBM_USERDATA);
 // the app was called Critter Music, and Critboard Music before that: keep using an older library if this one has none
 else if (!fs.existsSync(path.join(app.getPath('userData'), 'library.json'))) { for (const name of ['Critter Music', 'Critboard Music']) { const old = path.join(app.getPath('appData'), name); if (fs.existsSync(path.join(old, 'library.json'))) { app.setPath('userData', old); break; } } }
 const ICON = path.join(__dirname, 'assets', 'icon.png');
+// updates from the GitHub releases (updater.js): the music stops and the windows close before the installer takes over
+const updates = require('./updater')({ owner: 'booskers', repo: 'critter-sounds', name: 'Critter Sounds', parent: () => win, page: () => win && win.webContents,
+  beforeInstall: () => new Promise(res => { if (!win || win.isDestroyed()) return res(); win.once('closed', res); ipcMain.emit('quit-ok', {}); }) });
 const LIB = () => path.join(app.getPath('userData'), 'library.json');
 // Music\Critter Sounds: downloads, YouTube, soundscapes and their loops (CBM_MUSICDIR=<folder> puts it elsewhere, for testing)
 // (Settings › Folders can move it: prefs.json in the app's data folder remembers where)
@@ -268,7 +271,7 @@ function createWindow() {
 }
 // the main process's own words (the menu, file dialogs), in the page's language
 let LANG = 'en';
-const DE = { 'Mini player': 'Mini-Player', 'Homebase…': 'Homebase…', 'Appearance…': 'Aussehen…', 'Settings…': 'Einstellungen…', 'Quick tour': 'Kurztour', 'Full tour': 'Komplette Tour', 'Setup…': 'Einrichtung…', 'View': 'Ansicht', 'Reload': 'Neu laden', 'Full screen': 'Vollbild', 'Actual size': 'Originalgröße', 'Zoom in': 'Vergrößern', 'Zoom out': 'Verkleinern', 'Developer tools': 'Entwicklertools', 'Quit Critter Sounds': 'Critter Sounds beenden', 'Open the Critter Sounds folder': 'Ordner von Critter Sounds öffnen',
+const DE = { 'Check for updates…': 'Nach Aktualisierungen suchen…', 'Check for updates when starting': 'Beim Start nach Aktualisierungen suchen', 'Critter Sounds on GitHub': 'Critter Sounds auf GitHub', 'Mini player': 'Mini-Player', 'Homebase…': 'Homebase…', 'Appearance…': 'Aussehen…', 'Settings…': 'Einstellungen…', 'Quick tour': 'Kurztour', 'Full tour': 'Komplette Tour', 'Setup…': 'Einrichtung…', 'View': 'Ansicht', 'Reload': 'Neu laden', 'Full screen': 'Vollbild', 'Actual size': 'Originalgröße', 'Zoom in': 'Vergrößern', 'Zoom out': 'Verkleinern', 'Developer tools': 'Entwicklertools', 'Quit Critter Sounds': 'Critter Sounds beenden', 'Open the Critter Sounds folder': 'Ordner von Critter Sounds öffnen',
   'Choose a music folder': 'Wähle einen Musikordner', 'Choose sound files': 'Wähle Klangdateien', 'Choose an impulse response (a short WAV recording of a space)': 'Wähle eine Impulsantwort (eine kurze WAV-Aufnahme eines Raums)', 'Sound files': 'Klangdateien', 'Bring in a soundscape': 'Klanglandschaft hereinholen', 'Soundscapes': 'Klanglandschaften', 'Choose where Critter Sounds keeps its files': 'Wähle, wo Critter Sounds seine Dateien ablegt', 'Back up the library': 'Bibliothek sichern', 'Library backup': 'Bibliothekssicherung', 'This soundscape has Script nodes, which run their own JavaScript.': 'Diese Klanglandschaft hat Skript-Knoten, die eigenes JavaScript ausführen.', 'Only keep the scripts if you trust whoever made this file. Without them, the rest of the soundscape still comes in.': 'Behalte die Skripte nur, wenn du der Person vertraust, die diese Datei gemacht hat. Ohne sie kommt der Rest der Klanglandschaft trotzdem herein.', 'Bring it in without the scripts': 'Ohne die Skripte hereinholen', 'Keep the scripts': 'Skripte behalten', 'Cancel': 'Abbrechen' };
 const L = s => (LANG === 'de' && DE[s]) || s;
 ipcMain.handle('sys-lang', () => { try { return (app.getPreferredSystemLanguages()[0] || app.getLocale() || 'en'); } catch { return app.getLocale() || 'en'; } });
@@ -287,6 +290,8 @@ function appMenu() {
     { label: L('Quick tour'), click: () => wc && wc.send('key', 'tour-basic') },
     { label: L('Full tour'), click: () => wc && wc.send('key', 'tour-full') },
     { label: L('Setup…'), click: () => wc && wc.send('key', 'setup') },
+    { type: 'separator' },
+    ...updates.menuItems().map(m => ({ ...m, label: L(m.label) })),
     { type: 'separator' },
     { label: L('View'), submenu: [
       { label: L('Reload'), accelerator: 'CmdOrCtrl+R', click: () => wc && wc.reload() },
@@ -656,7 +661,7 @@ ipcMain.handle('open-external', (e, url) => { if (/^https?:\/\//i.test(url)) she
 function buildMenu() { Menu.setApplicationMenu(null); }
 
 app.whenReady().then(() => {
-  buildMenu(); makeFolders(); createWindow();
+  buildMenu(); makeFolders(); createWindow(); updates.onStart();
   // the keyboard's media keys work even when the app is in the background
   mediaKeys(true);
   // MUSIC_SELFTEST=<json>: drives the app for automated checks (used when building)

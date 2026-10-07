@@ -55,6 +55,10 @@ npm start
 
 The technical notes (streaming, effects, soundscapes, bots) are in Critter's [README](https://github.com/booskers/critter/blob/main/critboard-desktop/README.md#critter-sounds-the-desktop-music-player).
 
+## Updates
+
+The app updates itself from this repository's releases (`updater.js`, electron-updater): it looks when it starts (Settings › Updates turns that off), and Help, Settings and the Critter Sounds menu have **Check for updates**. The pop-up lists up to five changes, offers Update now, Later or Skip this version, shows the download and hands over to the installer, which for an update (`build/installer.nsh`) asks nothing, shows its progress and starts the app again. A release needs `Critter-Sounds-Setup.exe`, its `.blockmap` and `latest.yml` from `dist/`. What changed in each version: [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
-[MIT](LICENSE): use, change and share it freely, as long as you keep the copyright notice and give credit. Pad icons come from [game-icons.net](https://game-icons.net) (CC BY 3.0), and library tracks keep their own licenses.
+[MIT](LICENSE), made with love by booskers / Polychrome: use, change and share it freely, as long as you keep the copyright notice and give credit. Pad icons come from [game-icons.net](https://game-icons.net) (CC BY 3.0), and library tracks keep their own licenses.

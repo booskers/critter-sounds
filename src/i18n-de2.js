@@ -195,3 +195,10 @@ Object.assign(window.I18N_DE, {
   'Off': 'Aus', 'Soft': 'Sanft', 'Full': 'Voll', 'Fonts': 'Schriften', 'The dragon rolls a 20': 'Der Drache würfelt eine 20', 'Easy reading': 'Leicht lesbar',
   'That\'s only the lobby code. Paste the whole music code from Critter VTT\'s Music window (the lobby owner has it); the table only plays music from an app that has it.': 'Das ist nur der Lobbycode. Füge den ganzen Musikcode aus dem Musikfenster von Critter VTT ein (der Lobbybesitzer hat ihn); der Tisch spielt nur Musik aus einer App, die ihn hat.'
 });
+// ---------- Aktualisierungen ----------
+Object.assign(window.I18N_DE, {
+  'Updates': 'Aktualisierungen', 'Check for updates…': 'Nach Aktualisierungen suchen…', 'Check for updates': 'Nach Aktualisierungen suchen', 'A newer Critter Sounds, from GitHub': 'Ein neueres Critter Sounds, von GitHub',
+  'Critter Sounds on GitHub': 'Critter Sounds auf GitHub', 'The code, the releases and what changed': 'Der Code, die Versionen und was sich geändert hat',
+  'Check for updates when Critter Sounds starts': 'Beim Start von Critter Sounds nach Aktualisierungen suchen', 'A quiet look a few seconds after starting; it only speaks up when there is something new.': 'Ein stiller Blick ein paar Sekunden nach dem Start; es meldet sich nur, wenn es etwas Neues gibt.',
+  'Made with love by booskers / Polychrome.': 'Mit Liebe gemacht von booskers / Polychrome.'
+});

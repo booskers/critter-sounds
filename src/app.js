@@ -46,7 +46,8 @@ const ICONS = {
   palette: `<path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.8-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1" ${F}/><circle cx="10" cy="7.3" r="1.1" ${F}/><circle cx="14.5" cy="7.3" r="1.1" ${F}/>`,
   home: '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/>',
   trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 12.5h9l1-12.5"/>', edit: '<path d="M15.5 4.5l4 4L8.5 19.5H4.5v-4z"/>',
-  refresh: '<path d="M20 11a8 8 0 0 0-14.3-4.4M4 4v4h4M4 13a8 8 0 0 0 14.3 4.4M20 20v-4h-4"/>', sort: '<path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/>',
+  refresh: '<path d="M20 11a8 8 0 0 0-14.3-4.4M4 4v4h4M4 13a8 8 0 0 0 14.3 4.4M20 20v-4h-4"/>',
+  github: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4M9 18c-4.51 2-5-2-7-2"/>', sort: '<path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/>',
   credit: '<circle cx="12" cy="12" r="9"/><path d="M14.8 9.5a3.5 3.5 0 1 0 0 5"/>', playnext: `<path d="M4 6h10M4 12h7M4 18h7"/><path d="M14 11v8l6-4z" ${F}/>`,
   link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
   square: '<rect x="5" y="5" width="14" height="14" rx="2.5"/>', star: '<path d="M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.7l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/>',
@@ -2240,14 +2241,16 @@ function helpMenu(anchor) {
     '-',
     { label: 'Show all tips again', sub: 'The light blue boxes you closed with ✕', icon: 'refresh', fn: resetTips },
     { label: 'Settings…', sub: 'Language, folders, keys and more', icon: 'gear', fn: settings },
-    { label: 'Help window', sub: 'Shortcuts, tips and thanks', icon: 'help', fn: () => { const l = leaves().find(x => x.p === 'help'); if (l) touch(l); else openPanel('help'); } }]);
+    { label: 'Help window', sub: 'Shortcuts, tips and thanks', icon: 'help', fn: () => { const l = leaves().find(x => x.p === 'help'); if (l) touch(l); else openPanel('help'); } },
+    ...(desk.updates ? ['-', { label: 'Check for updates…', sub: 'A newer Critter Sounds, from GitHub', icon: 'refresh', fn: () => desk.updates.check() },
+      { label: 'Critter Sounds on GitHub', sub: 'The code, the releases and what changed', icon: 'github', fn: () => desk.updates.github() }] : [])]);
 }
 
 /* ---------- settings: what's useful now and then, but needn't be on screen ---------- */
 async function settings() {
   if (document.querySelector('.modal')) return;
   closeMenu();
-  const s = S(), dir = await desk.csDir().catch(() => ({ dir: '' }));
+  const s = S(), dir = await desk.csDir().catch(() => ({ dir: '' })), upd = desk.updates ? await desk.updates.get().catch(() => null) : null;
   const sec = (title, ...kids) => h('section', { class: 'setsec' }, h('div', { class: 'sec', text: title }), ...kids);
   const chk = (label, sub, get, set) => h('label', { class: 'setchk' }, h('input', { type: 'checkbox', checked: !!get(), onchange: e => { set(e.target.checked); save(); } }), h('span', {}, h('b', { text: label }), sub ? h('small', { text: sub }) : null));
   const slider = (label, key, min, max, stepv, show) => h('div', { class: 'sl' }, h('span', { text: label }),
@@ -2280,6 +2283,12 @@ async function settings() {
           h('button', { type: 'button', class: 'btn tiny ghost', text: 'Back up the library…', title: 'Playlists, pads, scenes, layouts and settings, as one file', onclick: async () => { await desk.saveLib(LIB).catch(() => {}); const f = await desk.libBackup(); if (f) toast('Saved a backup: ' + f); } }))),
       sec('Connection',
         h('div', { class: 'row' }, h('span', { class: 'grow hint', text: 'Homebase connects this app to Critter VTT. Use the same one as your table.' }), h('button', { type: 'button', class: 'btn tiny', text: 'Homebase…', onclick: () => { box.remove(); if (window.CRITBOARD_DESKTOP) window.CRITBOARD_DESKTOP.changeHomebase(); } }))),
+      upd ? sec('Updates',
+        h('label', { class: 'setchk' }, h('input', { type: 'checkbox', checked: upd.auto, onchange: e => desk.updates.set(e.target.checked) }), h('span', {}, h('b', { text: 'Check for updates when Critter Sounds starts' }), h('small', { text: 'A quiet look a few seconds after starting; it only speaks up when there is something new.' }))),
+        h('div', { class: 'row' }, h('span', { class: 'grow hint notr', text: 'Critter Sounds ' + upd.version }),
+          h('button', { type: 'button', class: 'btn tiny', text: 'Check for updates', onclick: () => desk.updates.check() }),
+          h('button', { type: 'button', class: 'btn tiny ghost', text: 'GitHub', title: 'Critter Sounds on GitHub', onclick: () => desk.updates.github() })),
+        h('p', { class: 'hint', text: 'Made with love by booskers / Polychrome.' })) : null,
       sec('Tips and help',
         h('div', { class: 'row' },
           h('button', { type: 'button', class: 'btn tiny', text: 'Show all tips again', onclick: resetTips }),

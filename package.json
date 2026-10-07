@@ -1,7 +1,7 @@
 {
   "name": "critboard-music",
   "productName": "Critter Sounds",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Critter Sounds: plays your music to a Critter table, live, with fades and effects.",
   "main": "main.js",
   "private": true,
@@ -21,7 +21,10 @@
       "assets/**/*",
       "nodes-guide/**/*",
       "bots/**/*",
-      "www/**/*"
+      "www/**/*",
+      "updater.js",
+      "update.html",
+      "update-preload.js"
     ],
     "directories": {
       "output": "dist"
@@ -33,8 +36,16 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Critter Sounds"
-    }
+      "shortcutName": "Critter Sounds",
+      "artifactName": "Critter-Sounds-Setup.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "booskers",
+        "repo": "critter-sounds"
+      }
+    ]
   },
   "devDependencies": {
     "electron": "^44.5.1",
@@ -47,7 +58,13 @@
     "@fluxerjs/voice": "^3.1.0",
     "@noble/ciphers": "^2.4.0",
     "discord.js": "^14.27.0",
+    "electron-updater": "^6.8.9",
     "opusscript": "^0.0.8",
     "prism-media": "^1.3.5"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/booskers/critter-sounds.git"
+  },
+  "license": "MIT"
 }

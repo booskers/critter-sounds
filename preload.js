@@ -74,5 +74,12 @@ contextBridge.exposeInMainWorld('desk', {
   showItem: p => ipcRenderer.invoke('show-item', p),
   catalog: (name, fresh) => ipcRenderer.invoke('catalog', name, fresh),
   webGet: (url, headers) => ipcRenderer.invoke('web-get', url, headers),
-  download: o => ipcRenderer.invoke('download', o)
+  download: o => ipcRenderer.invoke('download', o),
+  // updates from GitHub: { auto, skip, version, repo, changelog }, the on-start setting, a check now, the GitHub page
+  updates: {
+    get: () => ipcRenderer.invoke('upd:get'),
+    set: auto => ipcRenderer.invoke('upd:set', { auto: !!auto }),
+    check: () => ipcRenderer.invoke('upd:check'),
+    github: () => ipcRenderer.invoke('upd:github')
+  }
 });

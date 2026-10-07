@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 (2026-10-07)
+- Updates inside the app: Critter Sounds checks GitHub when it starts (Settings › Updates turns that off), shows the most important changes, and updates with one click.
+- Update now, Later, or Skip this version, with a progress bar for the download and then the installer's own; Critter Sounds opens again by itself.
+- Check for updates in Help, in Settings and in the Critter Sounds menu (German too).
+- A GitHub button in Help and Settings.
+- The licence says who made it: made with love by booskers / Polychrome.
+
 ## 1.1.0 (2026-10-07)
 - The shared Critter look (with Critter VTT and Critter Notes): surfaces lift by light instead of lines, drawn selects and checkboxes,
   Atkinson Hyperlegible Next, a see-through title bar showing the mark, the full logo in the header, glows only on hover.
