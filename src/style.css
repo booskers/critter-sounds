@@ -803,3 +803,211 @@ html.dysfont body{line-height:1.55;letter-spacing:.01em;word-spacing:.06em}
 /* tours and dialogs never touch the window's edge: 12px of room at any size, and they scroll inside when the window is short */
 .tour-bub{box-sizing:border-box;width:min(360px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}.tour-bub.wide{width:min(520px,calc(100vw - 24px))}
 .modal .card{box-sizing:border-box;max-width:calc(100vw - 24px);max-height:calc(100vh - 24px);overflow:auto}
+
+/* the web version: no window frame of its own, and no folders or mini player */
+body.web #titlebar,body.web #miniBtn,body.web #folderBtn{display:none}
+/* Critter Sounds nearby: the top bar's button, the bar while one controls another, the codes both screens show */
+#lanBtn .lann:not(:empty){min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:99px;background:var(--accent);color:var(--on-accent,var(--accent-ink));font-size:11px;font-weight:700;display:inline-grid;place-items:center}
+#lanBtn.on{color:var(--accent-text,var(--accent))}
+.lanbar{flex:none;display:flex;align-items:center;gap:10px;margin:0 12px 8px;padding:8px 12px;border-radius:14px;background:color-mix(in oklab,var(--accent) 16%,var(--surface-2,var(--panel)));color:var(--ink)}
+.lanbar .grow{min-width:0}
+.lanbadge{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:var(--accent);color:var(--on-accent,var(--accent-ink))}
+.lancode{font:750 30px/1.1 var(--font-display,inherit);letter-spacing:.14em;text-align:center;padding:12px;border-radius:14px;background:var(--surface-1,rgb(0 0 0/.2));color:var(--ink);user-select:text}
+.lanm input[type=text]{flex:1;min-width:0}
+body.lanctl #conn{display:none}
+/* what only the desktop app does */
+.mi.offdesk small{color:var(--accent-text,var(--accent))}
+.deskonly{display:grid;justify-items:center;text-align:center;gap:8px;padding:28px 16px;max-width:440px;margin:auto}
+.deskonly .dlgb{width:44px;height:44px;border-radius:14px}
+.deskonly p{margin:0}
+.deskchip{font-size:11px;font-weight:650;color:var(--accent-text,var(--accent));background:color-mix(in oklab,var(--accent) 14%,transparent);border:0;border-radius:99px;padding:2px 8px;margin-left:6px}
+.btn.offdesk{opacity:.75}
+
+/* ===================== a phone (the web version, 720px wide or less): mobile.js ===================== */
+#mob{display:none}
+body.phone #titlebar,body.phone #top,body.phone #main,body.phone #lanBar{display:none}
+body.phone{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body.phone #mob{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto auto;position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);z-index:2}
+body.phone #mob[hidden]{display:none}
+/* the large title, with Back on the left when there is somewhere to go back to */
+.mhead{display:flex;align-items:center;gap:4px;padding:8px 8px 4px 14px;min-height:52px}
+.mtitle{flex:1;min-width:0;margin:0;font:var(--fw-display,750) 28px/1.15 var(--font-display,inherit);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;outline:none}
+.mback{display:flex;align-items:center;gap:2px;min-height:44px;min-width:44px;margin-left:-8px;padding:0 6px 0 0;border:0;background:none;color:var(--accent-text,var(--accent));font:inherit;font-size:16px;cursor:pointer;max-width:40%}
+.mback[hidden]{display:none}
+.mback .ico svg{width:24px;height:24px}
+.mbackl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mright{display:flex;align-items:center;gap:2px}
+.mright .ib,.mright .btn{min-width:44px;min-height:44px}
+.mright #lanBtn .lanl{display:none}
+/* the screen's own buttons, under the title */
+.mtools{padding:0 14px 8px}.mtools[hidden]{display:none}
+.mtools .mth{display:block;height:auto;padding:0;border:0;background:none;box-shadow:none}
+.mtools .tt{display:none}
+.mtools .tx,.mtools .mth.tight .tx{display:flex!important;flex-wrap:wrap;gap:6px;align-items:center}
+.mview{overflow:auto;overscroll-behavior:contain;touch-action:pan-y;padding:0 14px 16px;outline:none}
+.mview.in-r{animation:m-in-r .26s cubic-bezier(.2,.8,.2,1)}.mview.in-l{animation:m-in-l .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes m-in-r{from{transform:translateX(28%);opacity:.3}}@keyframes m-in-l{from{transform:translateX(-18%);opacity:.3}}
+.mtile{display:block;background:none;border:0;box-shadow:none;border-radius:0;overflow:visible;container-type:inline-size}
+.mtile .mbod{overflow:visible;padding:0;user-select:none}
+/* the mini player above the tabs */
+.mmini{display:flex;align-items:center;gap:2px;margin:0 8px 6px;padding:6px 6px 6px 8px;border-radius:16px;background:var(--surface-3,var(--panel2));box-shadow:var(--shadow-2,0 8px 24px rgb(0 0 0/.35))}
+.mmopen{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:48px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;touch-action:none}
+.mart{flex:none;width:44px;height:44px;border-radius:10px;background:var(--surface-2,var(--panel)) center/cover no-repeat;display:grid;place-items:center;color:var(--accent-text,var(--accent))}
+.mart.has .ico{display:none}
+.mmtx{min-width:0;display:grid}
+.mmt{font-weight:650;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mms{font-size:12.5px;color:var(--ink-2,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mmini .ib{flex:none;width:44px;height:44px}
+.mmini .ib .ico svg{width:24px;height:24px}
+/* the tab bar */
+.mtabs{display:grid;grid-template-columns:repeat(5,1fr);padding:2px 4px calc(2px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--surface-1,var(--panel)) 88%,transparent);backdrop-filter:blur(20px) saturate(1.4)}
+.mtab{display:grid;justify-items:center;align-content:center;gap:2px;min-height:52px;padding:4px 0;border:0;background:none;color:var(--ink-2,var(--muted));font:inherit;font-size:11px;font-weight:600;cursor:pointer}
+.mtab .ico svg{width:25px;height:25px}
+.mtab.on{color:var(--accent-text,var(--accent))}
+.mtab:focus-visible,.mmopen:focus-visible,.mback:focus-visible,.mrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:12px}
+/* Now playing: a sheet from the bottom */
+.mscrim{position:fixed;inset:0;z-index:55;background:rgb(0 0 0/.5);opacity:0;transition:opacity .3s}.mscrim.open{opacity:1}
+.mscrim[hidden]{display:none}
+.msheet{position:fixed;left:0;right:0;bottom:0;top:calc(10px + env(safe-area-inset-top));z-index:56;display:flex;flex-direction:column;background:var(--surface-2,var(--panel));border-radius:20px 20px 0 0;box-shadow:0 -12px 40px rgb(0 0 0/.4);transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.msheet.open{transform:none}.msheet[hidden]{display:none}
+.msgrab{flex:none;width:40px;height:5px;border-radius:3px;background:var(--ink-3,rgb(255 255 255/.35));margin:8px auto 2px;touch-action:none}
+.mshead{flex:none;display:flex;align-items:center;gap:6px;padding:0 10px;min-height:48px;touch-action:none}
+.mshead .ib{width:44px;height:44px}
+.msbody{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 16px calc(16px + env(safe-area-inset-bottom))}
+body.phone #bar{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:6px 0 14px;background:none;border:0;overflow:visible}
+body.phone #bar #barGlow{display:none}
+body.phone #bar .now{padding:0;display:grid;gap:4px;justify-items:stretch;text-align:center}
+body.phone #bar .nowart{position:static;width:min(66vw,280px);height:min(66vw,280px);margin:4px auto 10px;border-radius:18px;box-shadow:var(--shadow-3,0 20px 50px rgb(0 0 0/.5))}
+body.phone #bar .nowtitle{font-size:20px;font-weight:700;white-space:normal}
+body.phone #bar .nowsub{white-space:normal}
+body.phone #bar .seek{margin-top:6px}
+body.phone #bar .trans{justify-content:center;gap:10px}
+body.phone #bar .tb{width:48px;height:48px}body.phone #bar .tb.big{width:64px;height:64px}
+body.phone #bar .vols,body.phone #bar .extra{display:grid;gap:10px}
+body.phone #bar .meter{display:none}
+body.phone #queue{display:flex;position:static;border:0;background:none;box-shadow:none;overflow:visible;border-radius:0}
+body.phone #queue .qnow{display:none}
+/* menus open as action sheets */
+body.phone .menu.msmenu{position:fixed;left:8px!important;right:8px;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom));z-index:201;width:auto;min-width:0;max-width:none;max-height:72vh;border-radius:18px;padding:0 6px 6px;transition:transform .2s}
+body.phone .menu-scrim{z-index:200}
+body.phone .msmenu .mi{min-height:48px;font-size:16px}
+body.phone .msmenu .mcancel{justify-content:center;margin-top:6px;font-weight:700;background:var(--surface-2,var(--panel));border-radius:12px}
+/* what a sideways swipe on a track will do */
+.mswipe{position:fixed;z-index:50;display:none;align-items:center;gap:6px;padding:0 14px;overflow:hidden;white-space:nowrap;pointer-events:none;color:#fff;font-weight:700;font-size:14px}
+.mswipe.on{display:flex}.mswipe.go{background:#1d7a45}.mswipe.alt{background:#5b2bd6}.mswipe.bad{background:#b73535}.mswipe.far .ico{transform:scale(1.2)}
+body.phone .tracks tr[data-id],body.phone .qlist li.qi{touch-action:pan-y;-webkit-touch-callout:none}
+body.phone .pad,body.phone .stile{-webkit-touch-callout:none}
+/* More: grouped rows */
+.mmore{display:grid;gap:4px}
+.mgroup{display:grid;margin:8px 0;padding:4px 0;border-radius:16px;background:var(--surface-2,var(--panel))}
+.mconn{padding:10px 12px;gap:8px}
+body.phone .mconn #conn{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+body.phone .mconn #conn .fld{flex:1 1 200px}
+.mrow{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 12px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.mrow+.mrow{box-shadow:inset 0 1px 0 color-mix(in srgb,currentColor 8%,transparent)}
+.mrow .mlab{flex:1;min-width:0;display:grid}.mrow .mlab b{font-size:15.5px}.mrow small{color:var(--ink-2,var(--muted))}
+.mrow .dlgb{width:32px;height:32px;border-radius:9px}
+.mchev{opacity:.55}
+/* touch: 44px targets, 16px text in fields (iPhones zoom into smaller ones), no hover-only controls */
+body.phone .btn{min-height:44px;font-size:15px}
+body.phone .btn.tiny{min-height:40px;padding-inline:12px}
+body.phone .ib{min-width:44px;min-height:44px}
+body.phone input[type=text],body.phone input[type=url],body.phone input[type=search],body.phone input:not([type]),body.phone select,body.phone textarea{font-size:16px;min-height:44px}
+body.phone input[type=range]{min-height:36px}
+body.phone .tracks td{padding-block:12px}
+body.phone .pad .pa,body.phone .pad .ib{opacity:1}
+body.phone .toast{left:12px;right:12px;transform:none;bottom:calc(150px + env(safe-area-inset-bottom))}
+body.phone.msheet-open .toast{bottom:calc(20px + env(safe-area-inset-bottom))}
+body.phone .modal .card{max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+@media (prefers-reduced-motion:reduce){.msheet,.mscrim,.mview,.menu.msmenu{transition:none!important;animation:none!important}}
+/* each piece keeps its row, whether or not the tools row shows */
+.mhead{grid-row:1}.mtools{grid-row:2}.mview{grid-row:3}.mmini{grid-row:4}.mtabs{grid-row:5}
+.mright .ib{background:none}
+body.phone #bar .nowart{translate:none;display:grid;place-items:center;align-self:center;justify-self:center;background-color:var(--surface-3,var(--panel2))}
+body.phone #bar .extra select{width:100%}
+body.phone #bar .vols .sl{grid-template-columns:72px minmax(0,1fr) 40px}
+/* the mini player: room to breathe, a bigger cover, plain buttons, and a thin line for how far the track is */
+.mmini{position:relative;gap:6px;min-height:72px;padding:8px 8px 10px 10px;margin:0 10px 8px;border-radius:18px;overflow:hidden}
+.mmopen{gap:12px;min-height:56px}
+.mart{width:56px;height:56px;border-radius:12px;box-shadow:0 4px 14px rgb(0 0 0/.35)}
+.mart .ico svg{width:26px;height:26px}
+.mmt{font-size:16px;line-height:1.25}.mms{font-size:13px;margin-top:2px}
+.mmini .ib{width:48px;height:48px;background:none;border-radius:50%}
+.mmini .ib .ico svg{width:28px;height:28px}
+.mmini .mplay .ico svg{width:32px;height:32px}
+.mprog{position:absolute;left:12px;right:12px;bottom:4px;height:3px;border-radius:2px;background:color-mix(in srgb,currentColor 12%,transparent);overflow:hidden;pointer-events:none}
+.mprog i{display:block;height:100%;width:0;background:var(--accent);border-radius:inherit}
+/* Now playing: the cover nearly as wide as the phone */
+body.phone #bar .nowart{width:min(calc(100vw - 48px),380px);height:min(calc(100vw - 48px),380px);border-radius:22px;margin:6px auto 14px}
+body.phone #bar .nowart:not(.has){background-image:linear-gradient(145deg,color-mix(in oklab,var(--accent) 55%,var(--surface-3,#222)),color-mix(in oklab,var(--accent2) 45%,var(--surface-1,#111)))}
+body.phone #bar .nowtitle{font-size:22px}
+.mart:not(.has){background-image:linear-gradient(145deg,color-mix(in oklab,var(--accent) 55%,var(--surface-3,#222)),color-mix(in oklab,var(--accent2) 45%,var(--surface-1,#111)));color:#fff}
+body.phone #bar .nowart:not(.has)::after{content:"\266A";font-size:min(28vw,140px);line-height:1;color:rgb(255 255 255/.88);text-shadow:0 6px 24px rgb(0 0 0/.3)}
+body.phone #bar .now::before,body.phone #bar .now::after{display:none}
+body.phone #bar .nowart{opacity:1}
+body.phone #bar .extra{grid-template-columns:minmax(0,1fr);justify-items:stretch}
+body.phone #bar .extra select{width:100%;max-width:none}
+
+/* ===================== a tablet (the web version): mobile.js ===================== */
+#tab{display:none}
+body.tablet #titlebar,body.tablet #top,body.tablet #main,body.tablet #miniBtn{display:none}
+body.tablet{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body.tablet #tab{display:grid;grid-template-columns:232px minmax(0,1fr);gap:12px;flex:1;min-height:0;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left))}
+body.tablet.tq-col #tab{grid-template-columns:232px minmax(0,1fr) 300px}
+body.tablet #tab[hidden]{display:none}
+/* the sidebar: the table's connection, the sections, then Nearby, Look and Settings */
+.tside{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto;overscroll-behavior:contain;padding:2px 2px 6px}
+.tbrand{display:flex;align-items:center;gap:10px;padding:4px 10px 6px;font:var(--fw-display,750) 19px/1.2 var(--font-display,inherit)}
+.tbrand .logomark{width:30px;height:30px;flex:none}
+.tconn{display:grid;gap:6px;padding:10px;border-radius:16px;background:var(--surface-1,var(--panel))}
+.tconn #conn{display:grid;gap:8px}
+.tconn #conn .fld{display:grid;gap:4px}.tconn #conn .fld input{width:100%;box-sizing:border-box}
+.tconn #connHint:empty{display:none}
+.tlist{display:grid;gap:2px}
+.tsec{padding:8px 12px 0}
+.tnav{display:flex;align-items:center;gap:12px;min-height:46px;padding:0 12px;border:0;border-radius:12px;background:none;color:var(--ink);font:inherit;font-size:15px;text-align:left;cursor:pointer}
+.tnav .ico{color:var(--accent-text,var(--accent))}.tnav .ico svg{width:22px;height:22px}
+.tnav.on{background:color-mix(in oklab,var(--accent) 22%,transparent);font-weight:650}
+.tnav small{margin-left:auto}
+.tnav:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tlan #lanBtn{width:100%;justify-content:flex-start;min-height:46px;padding:0 12px;font-size:15px;gap:12px}
+/* the panes */
+.tmain{display:flex;flex-direction:column;min-width:0;min-height:0}
+.thead{display:flex;align-items:center;gap:10px;padding:0 2px 10px;min-height:48px}
+.ttitle{font-size:30px}
+.tpanes{flex:1;min-height:0;display:grid;gap:12px}
+.tpanes.two{grid-template-columns:minmax(220px,300px) minmax(0,1fr)}
+.ttile{min-height:0}
+.ttile .th{cursor:default}
+.ttile .th .tx,.ttile .th.tight .tx{display:flex!important;flex-wrap:wrap;gap:6px;align-items:center}
+/* Up next: beside the panes on a wide tablet, sliding in over them when it stands upright */
+.tqueue{display:none;min-height:0;flex-direction:column}
+body.tablet.tq-col .tqueue{display:flex}
+body.tablet .tqueue #queue{flex:1;display:flex}
+body.tablet.tq-over .tqueue{display:flex;position:fixed;top:0;right:0;bottom:0;width:min(380px,86vw);z-index:57;padding:max(12px,env(safe-area-inset-top)) 12px 12px;background:var(--surface-2,var(--panel));box-shadow:-16px 0 40px rgb(0 0 0/.4);animation:tq-in .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes tq-in{from{transform:translateX(100%)}}
+.tscrim[hidden]{display:none}
+/* the desktop's player along the bottom, with touch-sized buttons */
+body.tablet #bar{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+body.tablet #bar .tb{width:46px;height:46px}body.tablet #bar .tb.big{width:56px;height:56px}
+/* touch: 44px targets, 16px text in fields, controls that don't wait for a hover */
+body.tablet .btn{min-height:44px;font-size:15px}
+body.tablet .btn.tiny{min-height:40px;padding-inline:12px}
+body.tablet .ib{min-width:44px;min-height:44px}
+body.tablet input[type=text],body.tablet input[type=url],body.tablet input[type=search],body.tablet input:not([type]),body.tablet select,body.tablet textarea{font-size:16px;min-height:44px}
+body.tablet .tracks td{padding-block:11px}
+body.tablet .pad .pa,body.tablet .pad .ib{opacity:1}
+body.tablet .tracks tr[data-id],body.tablet .qlist li.qi{touch-action:pan-y;-webkit-touch-callout:none}
+body.tablet .pad,body.tablet .stile{-webkit-touch-callout:none}
+@media (prefers-reduced-motion:reduce){body.tablet.tq-over .tqueue{animation:none}}
+.tbrand svg{height:34px;width:auto;max-width:100%}
+/* touch (phone and tablet): every control at least 44px, as on iOS */
+body:is(.phone,.tablet) .btn.tiny{min-height:44px}
+body:is(.phone,.tablet) [data-plid]{min-height:44px}
+body:is(.phone,.tablet) .chipb{min-height:44px;padding-inline:14px}
+body:is(.phone,.tablet) .tab{min-height:44px}
+body:is(.phone,.tablet) .pk{width:26px;height:26px;margin:9px}
+body:is(.phone,.tablet) .mini-chk{min-height:44px;display:inline-flex;align-items:center;gap:8px}
+body:is(.phone,.tablet) .mini-chk input{width:22px;height:22px}
+body:is(.phone,.tablet) .btn.tiny{min-width:44px;justify-content:center}
+:root[data-theme=light] .deskchip{color:color-mix(in oklab,var(--accent-text,var(--accent)) 72%,black)}

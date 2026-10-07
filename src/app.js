@@ -17,6 +17,8 @@ function h(tag, props, ...kids) {
   if (tag === 'button' && (e.classList.contains('btn') || e.parentElement?.classList.contains('seg')) && !e.querySelector('svg,.ico,.gi,img') && e.textContent.trim()) e.prepend(ico(autoIcon(e.textContent)));
   // an icon-only button says what it does, to the pointer (tooltip) and to screen readers
   if (tag === 'button' && !e.getAttribute('aria-label') && e.title && !e.textContent.replace(/[^p{L}p{N}]/gu, '')) e.setAttribute('aria-label', e.title);
+  // a field says what it's for to screen readers too, not only as a placeholder that disappears once you type
+  if ((tag === 'input' || tag === 'select' || tag === 'textarea') && !e.getAttribute('aria-label') && (e.placeholder || e.title)) e.setAttribute('aria-label', e.placeholder || e.title);
   if (tag === 'button' && e.classList.contains('icon-only') && !e.getAttribute('aria-label')) { const l = e.title || ICON_LABEL[(e.querySelector('.ico') || {}).dataset?.i] || ''; if (l) { e.setAttribute('aria-label', l); if (!e.title) e.title = l; } }
   return e;
 }
@@ -63,7 +65,7 @@ const ICONS = {
   link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
   square: '<rect x="5" y="5" width="14" height="14" rx="2.5"/>', star: '<path d="M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.7l-5.1 2.7 1-5.6-4.1-4 5.7-.8z"/>',
   save: '<path d="M5 4h11l3 3v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>', search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/>',
-  back: '<path d="M15 5l-7 7 7 7"/>', fwd: '<path d="M9 5l7 7-7 7"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>', sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>', down: '<path d="M5 9l7 7 7-7"/>', chev: '<path d="M10 6l6 6-6 6"/>', fwd: '<path d="M9 5l7 7-7 7"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>', sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
   note: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
   moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>', font: '<path d="M5 19 10.5 5h3L19 19M7.5 13h9"/>',
@@ -95,9 +97,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const base = p => String(p).split(/[\\/]/).pop();
 const dirOf = p => String(p).split(/[\\/]/).slice(0, -1).join('\\');
 const titleOf = p => base(p).replace(/\.[^.]+$/, '').replace(/_+/g, ' ').trim() || 'Track';
-const mediaUrl = p => 'app://music/media?p=' + encodeURIComponent(p);
+const mediaUrl = p => (window.CS_MEDIA ? CS_MEDIA(p) : 'app://music/media?p=' + encodeURIComponent(p));
 // a track is a file on this computer (path) or a sound on the web (url), played through the app's own address either way
-const remoteUrl = u => 'app://music/remote?u=' + encodeURIComponent(u);
+const remoteUrl = u => (window.CS_REMOTE ? CS_REMOTE(u) : 'app://music/remote?u=' + encodeURIComponent(u));
+// the web version (desk-web.js) does without what only the desktop app can do. Controlling a desktop app on the network
+// (lan.js) brings saving sounds and YouTube back: they happen on that computer, and the files stay there.
+const ON_WEB = !!window.CS_WEB;
+const canSave = () => !ON_WEB || !!(window.LAN && LAN.ctl);
+const DESKTOP_URL = 'https://github.com/booskers/critter-sounds/releases/latest';
+// a panel this can't show: 'save' ones (YouTube) come back while controlling a desktop app; 'here' ones (bots, web
+// pages) only work on the computer they run on
+const panelOff = P => !!P && (P.desk === 'save' ? !canSave() : P.desk === 'here' ? ON_WEB || !!(window.LAN && LAN.ctl) : false);
+const offNote = P => (window.LAN && LAN.ctl && P.desk === 'here' ? 'Runs on the computer it belongs to' : 'Available on Desktop');
 const srcUrl = x => (x.path ? mediaUrl(x.path) : x.url ? remoteUrl(x.url) : '');
 const keyOf = x => x.path || x.url || '';
 const clone = v => JSON.parse(JSON.stringify(v));
@@ -812,13 +823,14 @@ async function searchFreesound(page) {
 const itemOf = r => ({ id: uid(), url: r.url, title: r.title, img: r.img || r.thumb || undefined, dur: r.dur || 0, credit: r.credit, license: r.license, source: r.source, link: r.link, tags: Array.isArray(r.tags) ? r.tags.slice(0, 12) : undefined });
 async function saveOnline(r) {
   if (!r.url) return;
+  if (!canSave()) { toast('Saving sounds is available on Desktop. In the browser they play straight from the web.'); return; }
   toast(`Saving ${r.title}…`);
   try {
     const file = await desk.download({ url: r.url, source: r.source, title: r.title, credit: r.credit });
     for (const pl of LIB.playlists) for (const i of pl.items) if (i.url === r.url) i.path = file;
     for (const p of LIB.pads) if (p.url === r.url) p.path = file;
     for (const q of LIB.queue) if (q.item.url === r.url) q.item.path = file;
-    save(); renderPanels('playlist', 'online'); toast(`Saved to ${file}. It plays from there now, even offline.`);
+    save(); renderPanels('playlist', 'online'); toast(window.LAN && LAN.ctl ? `Saved on ${LAN.ctl.name}: ${file}. It plays from there now, even offline.` : `Saved to ${file}. It plays from there now, even offline.`);
   } catch (e) { toast('Saving failed: ' + errText(e)); }
 }
 // listen first, on this computer only: the table doesn't hear previews
@@ -864,7 +876,7 @@ function bulkBar() {
     h('button', { type: 'button', class: 'btn tiny primary', text: '+ Queue them', onclick: () => { enqueue(items()); clearPicked(); } }),
     h('button', { type: 'button', class: 'btn tiny', text: 'Add to playlist ▾', onclick: e => choosePlaylist(e.currentTarget, pl => { copyInto(pl, items()); clearPicked(); }) }),
     h('button', { type: 'button', class: 'btn tiny', text: 'Make sound pads', onclick: () => { makePads(items()); clearPicked(); } }),
-    h('button', { type: 'button', class: 'btn tiny ghost', text: '⭳ Save them', onclick: () => { pickedItems().forEach(saveOnline); clearPicked(); } }),
+    canSave() ? h('button', { type: 'button', class: 'btn tiny ghost', text: '⭳ Save them', onclick: () => { pickedItems().forEach(saveOnline); clearPicked(); } }) : h('span', { class: 'chip deskchip', icon: 'download', text: 'Saving: available on Desktop', title: 'In the browser, sounds play straight from the web. The desktop app saves them to your computer.' }),
     h('span', { class: 'grow' }),
     h('button', { type: 'button', class: 'btn tiny ghost', text: '✕ Clear', onclick: clearPicked }));
   return bar;
@@ -881,14 +893,14 @@ const PANELS = {
   playlists: { name: 'Playlists', icon: 'list', desc: 'Your playlists: make one from a music folder', render: panelPlaylists },
   playlist: { name: 'Playlist', icon: 'music', desc: 'The tracks in a playlist: play, queue, sort', render: panelPlaylist },
   online: { name: 'Online library', icon: 'globe', desc: 'Free music and sound effects to search and play', render: panelOnline },
-  youtube: { name: 'YouTube', icon: 'youtube', desc: 'Find sound on YouTube, listen, and save it', render: panelYouTube },
-  web: { name: 'Web source', icon: 'web', desc: 'Play the sound of any web page to the table', render: panelWeb },
+  youtube: { name: 'YouTube', icon: 'youtube', desc: 'Find sound on YouTube, listen, and save it', render: panelYouTube, desk: 'save', hideOff: true },
+  web: { name: 'Web source', icon: 'web', desc: 'Play the sound of any web page to the table', render: panelWeb, desk: 'here' },
   pads: { name: 'Sound pads', icon: 'pads', desc: 'Buttons for sound effects: one click plays', render: panelPads },
   scapes: { name: 'Soundscapes', icon: 'sparkle', desc: 'Living backgrounds made of layers of sound', render: panelScapes },
   scenes: { name: 'Scenes', icon: 'clapper', desc: 'Jump to a playlist with its effects in one click', render: panelScenes },
   effects: { name: 'Effects', icon: 'sliders', desc: 'Reverb, radio, muffle and more, for everyone', render: panelEffects },
   fades: { name: 'Fades', icon: 'wave', desc: 'How songs fade in, out and into each other', render: panelFades },
-  bots: { name: 'Discord & Fluxer', icon: 'headphones', desc: 'Play into a voice channel with your own bot', render: panelBots },
+  bots: { name: 'Discord & Fluxer', icon: 'headphones', desc: 'Play into a voice channel with your own bot', render: panelBots, desk: 'here' },
   log: { name: 'Session log', icon: 'clock', desc: 'What played when, also in Critter VTT\'s chat', render: panelLog },
   help: { name: 'Help', icon: 'help', desc: 'Shortcuts, tips and thanks', render: panelHelp },
   pick: { name: 'New window', icon: 'plus', render: panelPick, hidden: true }
@@ -945,10 +957,11 @@ const tileArea = l => { const el = document.querySelector(`.tile[data-id="${l.id
 function layoutChanged() { save(); renderTree(); }
 function applyLayout(tree) {
   const fresh = n => (n.t === 'leaf' ? { ...n, id: uid(), s: clone(n.s || {}) } : { ...n, id: uid(), a: fresh(n.a), b: fresh(n.b) });
-  LIB.layout = tree ? fresh(tree) : null; stopPreview(); layoutChanged();
+  LIB.layout = tree ? pruneOff(fresh(tree)) : null; stopPreview(); layoutChanged();
 }
 
 function renderTree() {
+  if (LIB.layout && pruneOff(LIB.layout) !== LIB.layout) LIB.layout = pruneOff(LIB.layout);
   headRO.disconnect();
   const c = $('#canvas');
   const keep = new Map([...c.querySelectorAll('.tbod')].map(b => [b.dataset.id, b.scrollTop]));
@@ -1034,12 +1047,28 @@ function renderLeaf(leaf, scroll) {
   const top = scroll ?? body.scrollTop;
   const tile = body.parentElement, extra = tile._tx || tile.querySelector('.tx'); extra.replaceChildren();
   body.replaceChildren();
-  try { PANELS[leaf.p].render(body, leaf, extra); } catch (e) { console.error(e); body.append(h('p', { class: 'hint bad', text: 'This window had a problem: ' + errText(e) })); }
+  try { if (panelOff(PANELS[leaf.p])) deskOnlyPanel(body, leaf); else PANELS[leaf.p].render(body, leaf, extra); } catch (e) { console.error(e); body.append(h('p', { class: 'hint bad', text: 'This window had a problem: ' + errText(e) })); }
   body.scrollTop = top;
+  // a slider without a name of its own takes the words beside it, for screen readers
+  body.querySelectorAll('input[type=range]:not([aria-label])').forEach(r => { const l = (r.closest('label') || r.parentElement.querySelector('span, b, label') || {}).textContent; if (l && l.trim()) r.setAttribute('aria-label', l.trim()); });
   fitHead(tile.querySelector('.th'), true);
   if (keep) { const f = body.querySelector(`[data-k="${keep.k}"]`); if (f) { f.focus(); try { f.setSelectionRange(keep.s, keep.e); } catch {} } }
 }
 function renderAll() { renderTree(); renderQueue(); paint(); }
+const DESK_WHY = {
+  web: 'Playing the sound of any web page to your table needs the Critter Sounds desktop app.',
+  bots: 'A Discord or Fluxer bot of your own, playing into a voice channel, needs the Critter Sounds desktop app.',
+  youtube: 'Finding and saving sound from YouTube needs the Critter Sounds desktop app.'
+};
+function deskOnlyPanel(body, leaf) {
+  const P = PANELS[leaf.p], ctl = window.LAN && LAN.ctl;
+  body.append(h('div', { class: 'deskonly' }, h('span', { class: 'dlgb' }, ico(P.icon)),
+    h('b', { text: ctl ? P.name + ' runs on the computer it belongs to' : 'Available on Desktop' }),
+    h('p', { class: 'hint', text: ctl ? 'You\'re controlling ' + ctl.name + ': use ' + P.name + ' on that computer itself.' : DESK_WHY[leaf.p] || 'The Critter Sounds desktop app can do this.' }),
+    ctl ? null : h('button', { type: 'button', class: 'btn primary', text: '⭳ Get the desktop app', onclick: () => desk.openExternal(DESKTOP_URL) })));
+}
+// a layout from the desktop app can hold windows the web version leaves out (YouTube): they fold away
+const pruneOff = n => { if (!n) return n; if (n.t === 'leaf') return PANELS[n.p] && PANELS[n.p].hideOff && panelOff(PANELS[n.p]) ? null : n; const a = pruneOff(n.a), b = pruneOff(n.b); return a === n.a && b === n.b ? n : !a ? b : !b ? a : { ...n, a, b }; };
 // a picture of a layout, for the layout menu and the empty canvas
 function miniLayout(n) {
   if (n.t === 'leaf') return h('div', { class: 'ml', title: PANELS[n.p].name }, ico(PANELS[n.p].icon));
@@ -1060,7 +1089,7 @@ function emptyCanvas() {
 }
 function panelPick(body, leaf) {
   body.append(h('p', { class: 'hint', text: 'What should this window show?' }),
-    h('div', { class: 'pickgrid' }, ...Object.entries(PANELS).filter(([, P]) => !P.hidden).map(([k, P]) => h('button', { type: 'button', class: 'pickb', title: P.desc, onclick: () => { leaf.p = k; leaf.s = k === 'playlist' ? { plId: (LIB.playlists[0] || {}).id } : {}; layoutChanged(); } }, h('span', { class: 'pi2' }, ico(P.icon)), h('b', { text: P.name }), h('span', { class: 'hint', text: P.desc })))));
+    h('div', { class: 'pickgrid' }, ...Object.entries(PANELS).filter(([, P]) => !P.hidden && !(P.hideOff && panelOff(P))).map(([k, P]) => h('button', { type: 'button', class: 'pickb', title: P.desc, onclick: () => { leaf.p = k; leaf.s = k === 'playlist' ? { plId: (LIB.playlists[0] || {}).id } : {}; layoutChanged(); } }, h('span', { class: 'pi2' }, ico(P.icon)), h('b', { text: P.name }), h('span', { class: 'hint', text: P.desc })))));
 }
 
 /* ---------- small menus and a question box ---------- */
@@ -1112,7 +1141,7 @@ function choosePlaylist(anchor, fn) {
   popMenu(anchor, [{ head: 'Add to which playlist?' }, ...LIB.playlists.map(pl => ({ label: pl.name, note: String(pl.items.length), icon: '🎵', fn: () => fn(pl) })), LIB.playlists.length ? '-' : null,
     { label: 'A new playlist…', icon: '＋', fn: async () => { const n = await ask('Name the new playlist', 'Online picks'); if (n) fn(newPlaylist(n.slice(0, 60))); } }]);
 }
-function choosePanel(anchor, fn, head) { popMenu(anchor, [{ head: head || 'Show in this window' }, ...Object.entries(PANELS).filter(([, P]) => !P.hidden).map(([k, P]) => ({ label: P.name, sub: P.desc, icon: P.icon, fn: () => fn(k) }))]); }
+function choosePanel(anchor, fn, head) { popMenu(anchor, [{ head: head || 'Show in this window' }, ...Object.entries(PANELS).filter(([, P]) => !P.hidden && !(P.hideOff && panelOff(P))).map(([k, P]) => ({ label: P.name, sub: panelOff(P) ? offNote(P) : P.desc, icon: P.icon, cls: panelOff(P) ? 'offdesk' : '', fn: () => fn(k) }))]); }
 const windowMenu = anchor => choosePanel(anchor, p => openPanel(p, p === 'playlist' ? { plId: (LIB.playlists[0] || {}).id } : {}), 'Add a window');
 // prompt() doesn't exist in the app, so this asks instead
 function ask(title, value) {
@@ -1146,6 +1175,7 @@ function showPlaylist(pl) {
   checkMissing(pl); durQueue(pl.items);
 }
 function panelPlaylists(body, leaf) {
+  if (ON_WEB && !(window.LAN && LAN.ctl)) body.append(tip('webfiles', 'In the browser, the files you add are kept in this browser\'s own storage, on this device only. Nothing is uploaded.'));
   const shown = new Set(leaves().filter(l => l.p === 'playlist').map(l => l.s.plId));
   body.append(h('div', { class: 'vtools' },
     h('button', { type: 'button', class: 'btn tiny primary', text: '📁 From a folder', onclick: async () => { const p = await desk.pickFolder(); if (p.length) newPlaylistFrom(p); } }),
@@ -1249,7 +1279,7 @@ function trackMenu(pl, leaf, e) {
     { label: many ? `Add ${items.length} to the queue` : 'Add to the queue', icon: '☰', fn: () => enqueue(items) },
     { label: 'Add to another playlist…', icon: '🎵', fn: () => choosePlaylist(null, p => copyInto(p, items)) },
     { label: many ? 'Make them sound pads' : 'Make it a sound pad', icon: '🔔', fn: () => makePads(items) },
-    one.path ? { label: 'Show in folder', icon: '📂', fn: () => desk.showItem(one.path) } : { label: 'Save to this computer', icon: '⭳', fn: () => items.forEach(saveOnline) },
+    one.path ? (ON_WEB ? null : { label: 'Show in folder', icon: '📂', fn: () => desk.showItem(one.path) }) : { label: 'Save to this computer', icon: '⭳', fn: () => items.forEach(saveOnline) },
     one.link ? { label: 'Open its web page', icon: '🔗', fn: () => desk.openExternal(one.link) } : null,
     '-', { label: many ? `Remove ${items.length} tracks` : 'Remove from the playlist', icon: '✕', cls: 'bad', fn: () => removeSel(pl) }], e.clientX, e.clientY);
 }
@@ -1262,8 +1292,9 @@ function copyCredits(pl) {
 function panelOnline(body, leaf, extra) {
   const src = leaf.s.src || LIB.lastSrc || 'tabletop';
   extra.append(h('label', { class: 'pvol', title: 'How loud previews play on this computer' }, ico('headphones'),
-    h('input', { type: 'range', min: 0, max: 100, value: Math.round(S().prevVol * 100), oninput: e => { S().prevVol = +e.target.value / 100; if (ONLINE.preview) ONLINE.preview.volume = S().prevVol; save(); } })));
+    h('input', { type: 'range', min: 0, max: 100, value: Math.round(S().prevVol * 100), 'aria-label': 'Preview volume', oninput: e => { S().prevVol = +e.target.value / 100; if (ONLINE.preview) ONLINE.preview.volume = S().prevVol; save(); } })));
   body.append(h('div', { class: 'tabs' }, ...SOURCES.map(([k, n, d]) => h('button', { type: 'button', class: 'tab' + (k === src ? ' on' : ''), title: d, onclick: () => { leaf.s.src = k; LIB.lastSrc = k; save(); renderLeaf(leaf); } }, h('b', { text: n }), h('span', { text: d })))));
+  if (!canSave()) body.append(tip('webonline', 'In the browser, these play straight from the web: play them, queue them, put them in playlists or make pads. Saving them to your computer is available on Desktop.'));
   body.append(bulkBar());
   ({ tabletop: onlineTabletop, incompetech: onlineIncompetech, openverse: onlineOpenverse, freesound: onlineFreesound })[src](body, leaf);
 }
@@ -1280,7 +1311,7 @@ function resultActions(r) {
     h('button', { type: 'button', class: 'btn tiny qb', 'data-qurl': r.url, text: '+ Queue', title: 'Add it to the queue; it plays after what\'s playing', onclick: () => enqueue([itemOf(r)]) }),
     h('button', { type: 'button', class: 'btn tiny', text: 'Playlist ▾', title: 'Add it to a playlist', onclick: e => choosePlaylist(e.currentTarget, pl => copyInto(pl, [itemOf(r)])) }),
     h('button', { type: 'button', class: 'btn tiny ghost', text: 'Pad', title: 'Make it a sound pad', onclick: () => makePads([itemOf(r)]) }),
-    h('button', { type: 'button', class: 'btn tiny ghost', text: '⭳', title: 'Save it to this computer (Music › Critter Sounds)', onclick: () => saveOnline(r) }));
+    canSave() ? h('button', { type: 'button', class: 'btn tiny ghost', text: '⭳', title: window.LAN && LAN.ctl ? 'Save it to ' + LAN.ctl.name + ' (Music › Critter Sounds)' : 'Save it to this computer (Music › Critter Sounds)', onclick: () => saveOnline(r) }) : null);
 }
 const prevBtn = (r, big) => h('button', { type: 'button', class: 'pvb' + (big ? ' big' : ''), 'data-prev': r.id, onclick: () => preview(r) });
 function resultRow(r) {
@@ -2274,7 +2305,7 @@ async function settings() {
   if (document.querySelector('.modal')) return;
   closeMenu();
   const s = S(), dir = await desk.csDir().catch(() => ({ dir: '' })), upd = desk.updates ? await desk.updates.get().catch(() => null) : null;
-  const SETSEC = { General: 'gear', Accessibility: 'font', Sound: 'sliders', Folders: 'folder', Connection: 'link', 'Tips and help': 'help', Reset: 'refresh' };
+  const SETSEC = { General: 'gear', Nearby: 'link', Accessibility: 'font', Sound: 'sliders', Folders: 'folder', Connection: 'link', 'Tips and help': 'help', Reset: 'refresh' };
   const sec = (title, ...kids) => h('section', { class: 'setsec' }, h('div', { class: 'sec', icon: SETSEC[title] || 'sliders', text: title }), ...kids);
   const chk = (label, sub, get, set) => h('label', { class: 'setchk' }, h('input', { type: 'checkbox', checked: !!get(), onchange: e => { set(e.target.checked); save(); } }), h('span', {}, h('b', { text: label }), sub ? h('small', { text: sub }) : null));
   const slider = (label, key, min, max, stepv, show) => h('div', { class: 'sl' }, h('span', { text: label }),
@@ -2286,10 +2317,12 @@ async function settings() {
       sec('General',
         h('div', { class: 'setrow' }, h('span', { text: 'Language' }), h('select', { onchange: async e => { s.lang = e.target.value; await desk.saveLib(LIB).catch(() => {}); await desk.reloadAll(); } },
           h('option', { value: 'auto', text: 'System language', selected: !s.lang || s.lang === 'auto' }), h('option', { value: 'en', text: 'English', selected: s.lang === 'en' }), h('option', { value: 'de', text: 'Deutsch', selected: s.lang === 'de' }))),
+        window.screenSettings ? screenSettings() : null,
         h('div', { class: 'setrow' }, h('span', { text: 'Your name at the table' }), h('input', { type: 'text', value: s.name || '', maxLength: 40, placeholder: 'Critter Sounds', oninput: e => { s.name = e.target.value.trim() || 'Critter Sounds'; save(); pub(); } })),
         chk('Connect to the last table on start', 'Uses the music code from last time.', () => s.autoConnect !== false, v => { s.autoConnect = v; }),
         chk('Ask before quitting while something plays', '', () => s.confirmQuit !== false, v => { s.confirmQuit = v; }),
-        chk('Media keys work even when the app is in the background', 'Play, pause, next, previous and stop on the keyboard.', () => s.mediaKeys !== false, v => { s.mediaKeys = v; desk.mediaKeys(v); })),
+        ON_WEB ? null : chk('Media keys work even when the app is in the background', 'Play, pause, next, previous and stop on the keyboard.', () => s.mediaKeys !== false, v => { s.mediaKeys = v; desk.mediaKeys(v); })),
+      window.lanSettings ? sec('Nearby', ...lanSettings()) : null,
       sec('Accessibility',
         chk('A font for dyslexia', "OpenDyslexic, with a little more space between lines and words. Its letters have heavier bottoms, so they don't flip or swap.",
           () => (s.theme || {}).fonts === DYS_SET,
@@ -2299,6 +2332,9 @@ async function settings() {
         slider('Pause fade', 'pauseFade', 0, 5, 0.1, v => v.toFixed(1) + 's'),
         slider('Preview volume', 'prevVol', 0, 1, 0.05, v => Math.round(v * 100) + '%'),
         chk('Show what plays in Critter VTT\'s chat', 'Small notes in the lobby\'s chat, from the session log.', () => s.chatLog !== false, v => { s.chatLog = v; })),
+      ON_WEB ? sec('Folders',
+        h('p', { class: 'hint', text: 'In the browser, the sounds you add are kept in this browser\'s storage, on this device. Folders on your computer, downloads and rendered loops are available on Desktop.' }),
+        h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn tiny ghost', text: '💾 Back up the library…', title: 'Playlists, pads, scenes, layouts and settings, as one file (the sounds stay in the browser)', onclick: async () => { await desk.saveLib(LIB).catch(() => {}); const f = await desk.libBackup(); if (f) toast('Saved a backup: ' + f); } }))) :
       sec('Folders',
         h('p', { class: 'hint', text: 'Downloads, YouTube, soundscapes and rendered loops go here. Moving it doesn\'t move what\'s already saved.' }),
         dirLine,
@@ -2436,7 +2472,7 @@ function paintArt(c) {
   const tok = ++ART.tok, box = $('#nowArt'), glow = $('#barGlow'), bar = $('#bar'), root = document.documentElement.style;
   const plain = () => { box.style.backgroundImage = ''; box.classList.remove('has'); glow.style.backgroundImage = ''; bar.classList.remove('art'); bar.classList.toggle('tint', !!it); root.setProperty('--art', it ? `hsl(${hashStr(it.title || '') % 360} 65% 55%)` : 'var(--accent)'); };
   if (!it) { plain(); return; }
-  const urls = [it.path && 'app://music/cover?p=' + encodeURIComponent(it.path), it.img && remoteUrl(it.img)].filter(Boolean);
+  const urls = [it.path && (window.CS_COVER ? CS_COVER(it.path) : 'app://music/cover?p=' + encodeURIComponent(it.path)), it.img && remoteUrl(it.img)].filter(Boolean);
   const next = i => {
     if (tok !== ART.tok) return;
     if (i >= urls.length) { plain(); return; }
@@ -2506,6 +2542,7 @@ function bind() {
   $('#conn').onsubmit = e => { e.preventDefault(); if (NET.on) disconnect(); else connect(); };
   $('#mcode').addEventListener('input', e => { const p = e.target.selectionStart; e.target.value = e.target.value.toUpperCase(); e.target.setSelectionRange(p, p); });
   $('#hbBtn').onclick = () => window.CRITTER_DESKTOP && window.CRITTER_DESKTOP.changeHomebase();
+  document.body.classList.toggle('web', ON_WEB);
   $('#miniBtn').onclick = toggleMini;
   $('#themeBtn').onclick = appearance;
   // the top bar's and the transport's icons
@@ -2553,7 +2590,7 @@ function onKey(e) {
 }
 const MINI = { tab: '', q: '' };
 const miniHeight = () => (MINI.tab ? 520 : 250);
-async function toggleMini() { const on = !document.body.classList.contains('mini'); document.body.classList.toggle('mini', on); await desk.mini(on, miniHeight()); renderMini(); }
+async function toggleMini() { if (ON_WEB) return; const on = !document.body.classList.contains('mini'); document.body.classList.toggle('mini', on); await desk.mini(on, miniHeight()); renderMini(); }
 function miniTab(t) { MINI.tab = MINI.tab === t ? '' : t; desk.mini(true, miniHeight()); renderMini(); }
 // the mini player's own small queue (drag to reorder) and small pads
 function renderMini() {

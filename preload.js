@@ -1,7 +1,8 @@
 // What the player page may ask of the app: its library file, picking and scanning folders, and the web source window.
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 const on = (ch, fn) => { const h = (e, v) => fn(v); ipcRenderer.on(ch, h); return () => ipcRenderer.removeListener(ch, h); };
-contextBridge.exposeInMainWorld('desk', {
+// exposed as deskNative; the page's desk-boot.js copies it into window.desk, which remote control (lan.js) may stand in for
+contextBridge.exposeInMainWorld('deskNative', {
   loadLib: () => ipcRenderer.invoke('lib-load'),
   saveLib: data => ipcRenderer.invoke('lib-save', data),
   pickFolder: () => ipcRenderer.invoke('pick-folder'),
@@ -71,6 +72,7 @@ contextBridge.exposeInMainWorld('desk', {
   mediaKeys: on => ipcRenderer.invoke('media-keys', on),
   onWinState: fn => on('win:state', fn),
   openExternal: url => ipcRenderer.invoke('open-external', url),
+  hostName: () => ipcRenderer.invoke('host-name'),
   showItem: p => ipcRenderer.invoke('show-item', p),
   catalog: (name, fresh) => ipcRenderer.invoke('catalog', name, fresh),
   webGet: (url, headers) => ipcRenderer.invoke('web-get', url, headers),

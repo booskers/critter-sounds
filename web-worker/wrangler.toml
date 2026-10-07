@@ -1,0 +1,16 @@
+# Critter Sounds on the web. Build the page first (cd .. && node build.mjs --web), then: npx wrangler deploy
+name = "critter-sounds-web"
+main = "worker.js"
+compatibility_date = "2025-11-01"
+
+# the public address; Cloudflare makes the DNS record and certificate once crittervtt.com's DNS is on Cloudflare
+routes = [
+  { pattern = "sounds.crittervtt.com", custom_domain = true }
+]
+workers_dev = true
+
+# the page from ../web; /proxy runs the worker, everything else is a file
+[assets]
+directory = "../web"
+binding = "ASSETS"
+run_worker_first = ["/proxy"]

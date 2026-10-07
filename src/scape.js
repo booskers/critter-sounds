@@ -11,7 +11,8 @@
 const TYPES = {};
 const CATS = [['source', 'Sound sources'], ['control', 'Control'], ['trigger', 'Triggers'], ['math', 'Signal maths'], ['effect', 'Effects'], ['output', 'Output'], ['custom', 'Custom']];
 const clampN = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-const srcUrlOf = s => (!s ? '' : s.path ? 'app://music/media?p=' + encodeURIComponent(s.path) : s.url ? 'app://music/remote?u=' + encodeURIComponent(s.url) : '');
+// the desktop app's own addresses, or the web version's (desk-web.js)
+const srcUrlOf = s => (!s ? '' : s.path ? (window.CS_MEDIA ? CS_MEDIA(s.path) : 'app://music/media?p=' + encodeURIComponent(s.path)) : s.url ? (window.CS_REMOTE ? CS_REMOTE(s.url) : 'app://music/remote?u=' + encodeURIComponent(s.url)) : '');
 function defineNode(def) {
   if (!def || !/^[\w-]{1,40}$/.test(def.type || '')) throw new Error('a node needs a type made of letters, digits, - or _');
   def.ins = def.ins || []; def.outs = def.outs || []; def.params = def.params || []; def.cat = def.cat || 'custom';

@@ -152,3 +152,6 @@ textarea.code:focus{box-shadow:inset 0 0 0 1px var(--accent),0 0 0 3px var(--acc
 #cvHint{border:0;background:var(--surface-2);border-radius:var(--r-lg,14px);box-shadow:var(--shadow-2,none);color:var(--ink-2)}
 .qa,.menu.smenu{border:0;background:var(--surface-3);border-radius:var(--r-xl,18px);box-shadow:var(--shadow-3),var(--sheen,none)}
 .qai{border-radius:var(--r-sm,7px)}.qai.on,.qai:hover{background:var(--accent-soft)}
+/* the web version: no window frame of its own */
+body.web #titlebar{display:none}
+body.web>#titlebar~#stop{padding-top:10px}

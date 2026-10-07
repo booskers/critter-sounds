@@ -53,6 +53,23 @@ npm start
 
 **Homebase:** the app connects to the Homebase in `shared/homebase.config.json`. Set `HOMEBASE_SERVER=<url>` for a build that uses another one.
 
+### In a browser: sounds.crittervtt.com
+
+`node build.mjs --web` builds the same app into `web/` for browsers, with `src/desk-web.js` standing in for the desktop app's main process. Sounds you add stay in that browser's storage on that device; nothing is uploaded. Saving sounds from the web, YouTube, voice-chat bots, web page sound and rendering loops say **Available on Desktop**. `web-worker/` serves it on Cloudflare (`cd web-worker && npx wrangler deploy`), and passes online sounds and catalogues through `/proxy`, as the desktop app's `app://music/remote` does.
+
+On a phone (720px wide or less) it becomes one screen at a time with a tab bar, a mini player and a Now playing sheet (`src/mobile.js`). On a touch tablet it gets a sidebar, playlists beside their tracks, and the desktop's player bar. Both get iOS-style gestures:
+- **Sheets:** swipe the player sheet down to close it.
+- **Going back:** swipe from the left edge.
+- **Skipping:** swipe the mini player left or right.
+- **Rows:** swipe a track right for Play next, or left to add it to the queue.
+- **Menus:** press and hold for a menu.
+
+Every gesture also has a button. Settings › Screen layout picks the layout by hand.
+
+### Nearby: one Critter Sounds controls another
+
+Critter Sounds finds the others on the same network through Homebase's `lan` room (same public address, or a pairing code), and lists them under **Nearby**. Any of them can ask to control a desktop app; the desktop shows who's asking and a 4-digit code that must match, and nothing happens until someone there presses **Allow**. They then connect directly with WebRTC and no STUN or TURN server, keeping only local-network addresses, so everything after the handshake stays on the network (`src/lan.js`). The controlling side shows the desktop's library and plays, queues and downloads there; downloads are saved on the desktop only.
+
 The technical notes (streaming, effects, soundscapes, bots) are in Critter's [README](https://github.com/booskers/crittervtt/blob/main/crittervtt-desktop/README.md#critter-sounds-the-desktop-music-player).
 
 ## Updates
