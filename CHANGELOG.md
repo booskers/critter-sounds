@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 (2026-10-07)
+- Nearby: Critter Sounds finds the others on your network. A phone, tablet or another computer can control this one: you see who's asking and a code to check, and nothing happens until you press Allow.
+- While it's controlled, sounds play here and downloads are saved here; the two talk directly over your network, never through the internet.
+- Pair with a code when a device doesn't show up by itself.
+- Critter Sounds in your browser at sounds.crittervtt.com, with layouts for phones and tablets.
+- Every slider and search field has a name for screen readers.
+
 ## 1.3.0 (2026-10-07)
 - Critter Setup, a new installer in the Critter look; updates now download only what changed.
 - A font for dyslexia (OpenDyslexic, with more room between lines and words), as in Critter VTT and Critter Notes.

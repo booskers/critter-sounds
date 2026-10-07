@@ -1,7 +1,7 @@
 {
   "name": "critter-sounds",
   "productName": "Critter Sounds",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Critter Sounds: plays your music to a Critter table, live, with fades and effects.",
   "main": "main.js",
   "private": true,
