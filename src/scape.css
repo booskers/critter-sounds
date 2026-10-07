@@ -115,3 +115,10 @@ body.wiring .dot:not(.can){opacity:.35}
 .prm input[type=range]{width:100%;min-width:0}
 .prm input[type=range]::-webkit-slider-thumb{width:11px;height:11px;margin-top:-3.5px;box-shadow:0 0 0 2px var(--cc),0 1px 4px rgba(0,0,0,.5)}
 .prm input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--cc) 0 var(--p),rgba(255,255,255,.12) var(--p) 100%)}
+
+/* Design standard: nodes lift by elevation instead of outlines; the sound picker and icon are tonal */
+.node{border-color:transparent;box-shadow:var(--shadow-2,0 14px 30px -16px rgba(0,0,0,.9)),var(--sheen,inset 0 1px 0 rgba(255,255,255,.04))}
+.node.sel{box-shadow:0 0 0 2px color-mix(in srgb,var(--cc) 70%,transparent),var(--shadow-2,0 18px 40px -18px rgba(0,0,0,.95))}
+.node.missing{border-color:var(--line-strong,var(--line))}
+.sndb{border-color:transparent;background:var(--hover-2,var(--hover))}.sndb.empty{border:1px dashed var(--line-strong,var(--line))}
+#stop .sci{border-color:transparent;background:var(--hover-2,var(--hover))}

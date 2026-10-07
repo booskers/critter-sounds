@@ -202,3 +202,5 @@ Object.assign(window.I18N_DE, {
   'Check for updates when Critter Sounds starts': 'Beim Start von Critter Sounds nach Aktualisierungen suchen', 'A quiet look a few seconds after starting; it only speaks up when there is something new.': 'Ein stiller Blick ein paar Sekunden nach dem Start; es meldet sich nur, wenn es etwas Neues gibt.',
   'Made with love by booskers / Polychrome.': 'Mit Liebe gemacht von booskers / Polychrome.'
 });
+// design standard: film grain and the buttons' new words
+Object.assign(window.I18N_DE, { 'Film grain': 'Filmkorn', 'A fine grain over the background, like film.': 'Ein feines Korn über dem Hintergrund, wie bei Film.', 'Off': 'Aus', 'On': 'An' });

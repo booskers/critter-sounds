@@ -723,3 +723,44 @@ body.playing .now::before{animation:none}
 .tb.big:hover{filter:brightness(1.07);box-shadow:inset 0 1px 0 rgb(255 255 255/.22)}.tb.big:active{filter:brightness(.94)}
 .tb[aria-pressed=true]{background:var(--accent);color:var(--on-accent,var(--accent-ink));box-shadow:inset 0 1px 0 rgb(255 255 255/.22)}
 body.playing .tb.big{animation:none}
+
+/* Design standard (critter-design/README.md), the last pieces */
+:root{--focus:var(--accent-text);--scrim:rgb(0 0 0/.5)}
+:root[data-theme=light]{--scrim:rgb(20 20 30/.32)}
+/* the see-through title bar has no line under it */
+#titlebar::after{display:none}
+/* the connection hint: a tinted callout, no border */
+.connhint,.connhint.bad,.connhint.warn{border:0;border-color:transparent}
+.connhint.bad{background:var(--bad-soft,color-mix(in srgb,var(--bad) 14%,transparent))}
+.connhint.warn{background:var(--warn-soft,color-mix(in srgb,var(--warn) 14%,transparent))}
+/* menus float at radius 18; toasts at 14 on surface 4 with an icon badge */
+.menu,.menu.thmenu{border-radius:var(--r-xl,18px)}
+.toast{border-radius:var(--r-lg,14px);background:var(--surface-4);border:0;box-shadow:var(--shadow-3);display:flex;align-items:center;gap:10px}
+.toast[hidden]{display:none}
+.toast .tbadge,.dlgb{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--accent-soft);color:var(--accent-text);flex:none}
+.toast .tbadge .ico svg,.dlgb .ico svg{width:15px;height:15px}
+.row.dlgh{align-items:center;gap:10px}
+/* section labels: caps, faintest text, a leading icon in the accent */
+.sec{color:var(--ink-3)}.sec .ico{color:var(--accent-text);display:inline-grid}.sec .ico svg{width:13px;height:13px}
+/* chips carry an icon (game icons for pad groups) */
+.chipb{display:inline-flex;align-items:center;gap:5px}.chipb .ico svg{width:13px;height:13px}.chipb .gi svg{width:14px;height:14px;display:block}
+.navlist button .ico{flex:none;color:var(--ink-3)}.navlist button.on .ico,.navlist button.playing .ico{color:var(--accent-text)}
+.seg button{display:inline-flex;align-items:center;gap:6px}.seg button .ico svg{width:14px;height:14px}.seg button.on .ico{color:var(--accent-text)}
+/* pictures update with a 280ms fade */
+#barGlow{transition:opacity var(--dur-slow,280ms) var(--ease-out,ease)}
+.nowart{transition:opacity var(--dur-slow,280ms)}
+/* the cover glows only when you point at it */
+.nowart{box-shadow:none}
+.nowart.has::before{content:"";position:absolute;inset:0;border-radius:inherit;background:inherit;filter:blur(14px) saturate(1.6);opacity:0;z-index:-1;transition:opacity var(--dur,180ms)}
+.nowart.has:hover::before{opacity:var(--art-glow,.85)}
+@media (prefers-reduced-motion:reduce){#barGlow,.nowart,.nowart.has::before{transition:none}}
+/* text in a picked colour stays AA in light mode too: the colour is darkened until it reads on white */
+:root[data-theme=light] .ptags .pt{color:oklch(from var(--tc) min(l,.42) c h)}
+:root[data-theme=light] .pvb{color:oklch(from var(--accent-2) min(l,.42) c h)}
+:root[data-theme=light] .pvb.on{color:var(--on-accent-2,var(--accent2-ink))}
+.pad .k{color:var(--ink-2)}
+/* controls over pictures sit on a near-opaque surface (the design standard), so their text reads in both schemes */
+.pvb.big{background:color-mix(in srgb,var(--surface-3) 90%,transparent);color:var(--accent-2-text)}
+.pvb.big:hover{color:var(--ink)}
+.pvb.big.on{background:var(--accent-2);color:var(--on-accent-2,var(--accent2-ink))}
+:root[data-theme=light] .pvb.big{color:var(--accent-2-text)}

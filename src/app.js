@@ -7,13 +7,24 @@ const $ = (s, r = document) => r.querySelector(s);
 function h(tag, props, ...kids) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(props || {})) {
-    if (v === undefined || v === null || v === false) continue;
+    if (v === undefined || v === null || v === false || k === 'icon' || k === 'gicon') continue;
     if (k === 'class') e.className = v; else if (k === 'text') { if (tag === 'button') setLabel(e, v); else e.textContent = v; }
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else if (k in e && k !== 'list') e[k] = v; else e.setAttribute(k, v === true ? '' : v);
   }
   for (const c of kids.flat()) if (c !== null && c !== undefined && c !== false) e.append(c);
+  if (props && (props.icon || props.gicon)) e.prepend(props.gicon ? gi(props.gicon) : ico(props.icon));
+  // the design standard: every button has an icon; a text button without one gets one that fits its first word
+  if (tag === 'button' && (e.classList.contains('btn') || e.parentElement?.classList.contains('seg')) && !e.querySelector('svg,.ico,.gi,img') && e.textContent.trim()) e.prepend(ico(autoIcon(e.textContent)));
+  // an icon-only button says what it does, to the pointer (tooltip) and to screen readers
+  if (tag === 'button' && !e.getAttribute('aria-label') && e.title && !e.textContent.replace(/[^p{L}p{N}]/gu, '')) e.setAttribute('aria-label', e.title);
+  if (tag === 'button' && e.classList.contains('icon-only') && !e.getAttribute('aria-label')) { const l = e.title || ICON_LABEL[(e.querySelector('.ico') || {}).dataset?.i] || ''; if (l) { e.setAttribute('aria-label', l); if (!e.title) e.title = l; } }
   return e;
 }
+const AUTO_ICON = [[/^(cancel|close|no thanks|skip setup)/i, 'x'], [/^(ok|done|got it|keep|yes|all set)/i, 'check'], [/^(save|back up)/i, 'save'], [/^(connect|sign|reconnect|homebase)/i, 'link'], [/^(join|play|start|run|listen|hear|quick tour|let's go)/i, 'play'], [/^(leave|stop)/i, 'stop'],
+  [/^(search|find)/i, 'search'], [/^(install|download|bring in|render|import)/i, 'download'], [/^(update|reset|reload|refresh|try again|load|look for)/i, 'refresh'], [/^(remove|delete|forget|clear)/i, 'trash'], [/^(rename|change|edit)/i, 'edit'],
+  [/^(add|new|make|invite|create|＋)/i, 'plus'], [/^(choose|open|show|folder|📂)/i, 'folder'], [/^(back|previous)/i, 'back'], [/^(next|skip|more|continue)/i, 'fwd'], [/^(copy)/i, 'list'], [/^(help|how|\?)/i, 'help'], [/^(full tour|tour)/i, 'list'], [/^(settings)/i, 'gear']];
+const autoIcon = s => { s = String(s).trim(); for (const [re, ic] of AUTO_ICON) if (re.test(s)) return ic; return 'arrow'; };
+const ICON_LABEL = { x: 'Close', more: 'More', trash: 'Remove', edit: 'Edit', play: 'Play', stop: 'Stop', folder: 'Open the folder', search: 'Search', plus: 'Add', refresh: 'Refresh', help: 'Help', gear: 'Settings' };
 /* ---------- line icons: drawn on a 24 x 24 grid, in the text's own colour ---------- */
 const F = 'fill="currentColor" stroke="none"';
 const ICONS = {
@@ -54,13 +65,18 @@ const ICONS = {
   save: '<path d="M5 4h11l3 3v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>', search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/>',
   back: '<path d="M15 5l-7 7 7 7"/>', fwd: '<path d="M9 5l7 7-7 7"/>', clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>', sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
   note: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>', font: '<path d="M5 19 10.5 5h3L19 19M7.5 13h9"/>',
+  image: '<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/>', drop: '<path d="M12 3.5c3.5 4.3 6 7.6 6 10.6a6 6 0 0 1-12 0c0-3 2.5-6.3 6-10.6z"/>',
+  grain: `<circle cx="6" cy="7" r="1" ${F}/><circle cx="12" cy="5" r="1" ${F}/><circle cx="18" cy="8" r="1" ${F}/><circle cx="8" cy="13" r="1" ${F}/><circle cx="15" cy="12" r="1" ${F}/><circle cx="5" cy="18" r="1" ${F}/><circle cx="11" cy="18" r="1" ${F}/><circle cx="18" cy="17" r="1" ${F}/>`,
   gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/><circle cx="12" cy="12" r="6.2"/>'
 };
 // the symbols used in labels, and the icon each stands for
-const GLYPH = { '▶': 'play', '⏸': 'pause', '■': 'stop', '⏹': 'stop', '⏭': 'next', '⏮': 'prev', '+': 'plus', '＋': 'plus', '✕': 'x', '✓': 'check', '⭳': 'download', '☰': 'queue', '🎵': 'music', '📁': 'folder', '📂': 'folder', '🔔': 'pads', '▦': 'layout', '★': 'star', '💾': 'save', '🗑': 'trash', '◻': 'square', '✎': 'edit', '⟳': 'refresh', '⇅': 'sort', '©': 'credit', '⤴': 'playnext', '🔗': 'link', '⋯': 'more', '◀': 'back', '♪': 'note', '🎧': 'headphones', '◫': 'splitR', '⊟': 'splitD', '⇄': 'swap', '?': 'help' };
+const GLYPH = { '▶': 'play', '⏸': 'pause', '■': 'stop', '⏹': 'stop', '⏭': 'next', '⏮': 'prev', '+': 'plus', '＋': 'plus', '✕': 'x', '✓': 'check', '⭳': 'download', '☰': 'queue', '🎵': 'music', '📁': 'folder', '📂': 'folder', '🔔': 'pads', '▦': 'layout', '★': 'star', '💾': 'save', '🗑': 'trash', '◻': 'square', '✎': 'edit', '⟳': 'refresh', '⇅': 'sort', '©': 'credit', '⤴': 'playnext', '🔗': 'link', '⋯': 'more', '◀': 'back', '♪': 'note', '🎧': 'headphones', '◫': 'splitR', '⊟': 'splitD', '⇄': 'swap', '?': 'help', '🔀': 'shuffle', '🌙': 'moon', '⚙': 'gear' };
 const iconName = g => (ICONS[g] ? g : GLYPH[g] || '');
 function ico(name, cls) {
   const n = iconName(name), e = document.createElement('span'); e.className = 'ico' + (cls ? ' ' + cls : '');
+  if (n) e.dataset.i = n;
   if (n) e.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`; else e.textContent = name;
   return e;
 }
@@ -108,7 +124,7 @@ function tip(id, text) {
 }
 function resetTips() { S().hiddenTips = []; save(); renderPanels(); toast('All tips are back.'); }
 let toastT = 0;
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3800); }
+function toast(msg) { const t = $('#toast'); t.replaceChildren(h('span', { class: 'tbadge' }, ico(/could|couldn|failed|problem|wasn't|isn't|not /i.test(msg) ? 'help' : 'sparkle')), h('span', { text: msg })); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3800); }
 
 /* ============================== the library: playlists, pads, scenes, layouts, settings ============================== */
 const DEF = () => ({ fadeIn: 2, fadeOut: 3, xfade: 4, crossfade: true, pauseFade: 1, vol: 0.8, shuffle: false, loop: 'all', monitor: false, monVol: 0.7, prevVol: 0.7, theme: { accent: '#8800ff', accent2: '#4cc9f0', tone: 'midnight', scheme: 'dark', tint: 4, bleed: 1, fonts: 'Easy reading' }, sink: '', duck: 0.35, name: 'Critter Sounds', lobby: '', key: '', fx: mfxDefaults(), irPath: '', fsKey: '', queueOpen: true, chatLog: true });
@@ -612,6 +628,8 @@ function autoTag(p, force) {
 const TAG_COLORS = ['#e5484d', '#ff7a1a', '#d4a64a', '#a3e635', '#22c55e', '#14b8a6', '#4cc9f0', '#3b82f6', '#8b5cf6', '#d946ef', '#ec4899', '#94a3b8'];
 const hashStr = x => { let n = 0; for (const c of String(x)) n = (n * 31 + c.charCodeAt(0)) >>> 0; return n; };
 const tagColor = t => (t ? (LIB.tagColors && LIB.tagColors[t]) || TAG_COLORS[hashStr(t) % TAG_COLORS.length] : '');
+// a group's picture: the game icon of its first keyword rule
+const groupIcon = g => { const r = PAD_RULES.find(x => x[2] === g); return r ? r[1] : 'musical-notes'; };
 const padGroups = () => [...new Set([...PAD_GROUPS, ...LIB.pads.map(p => p.group).filter(Boolean)])];
 const padTags = () => [...new Set(LIB.pads.map(p => p.tag).filter(Boolean))].sort();
 
@@ -657,7 +675,7 @@ async function connect() {
     NET.offs.push(room.on('music-live', onLive), room.onPeers(ch => onPeers(ch.peers)), room.onConnection(() => paintConn()));
     // a new room has never heard this app: send what it plays even if nothing changed since the last connection
     pubLast = ''; pub(true); onPeers(room.peers()); sessionOnConnect();
-    $('#connBtn').textContent = 'Disconnect'; paintConn();
+    setLabel($('#connBtn'), '🔗 Disconnect'); paintConn();
   } catch (e) { chip('Not connected', 'bad'); hint('Could not reach Homebase. Check your connection and the Homebase setting.', 'bad'); }
   finally { $('#connBtn').disabled = false; }
 }
@@ -667,7 +685,7 @@ async function disconnect(quiet) {
   NET.offs.forEach(o => { try { o(); } catch {} }); NET.offs = [];
   if (NET.room) await NET.room.leave().catch(() => {});
   Object.assign(NET, { room: null, on: false, peers: [], M: null, keyState: 'none' });
-  $('#connBtn').textContent = 'Connect'; if (!quiet) { chip('Not connected'); hint(''); }
+  setLabel($('#connBtn'), '🔗 Connect'); if (!quiet) { chip('Not connected'); hint(''); }
 }
 async function checkKey() {
   const lk = NET.M && NET.M.lk;
@@ -847,7 +865,7 @@ function bulkBar() {
     h('button', { type: 'button', class: 'btn tiny', text: 'Make sound pads', onclick: () => { makePads(items()); clearPicked(); } }),
     h('button', { type: 'button', class: 'btn tiny ghost', text: '⭳ Save them', onclick: () => { pickedItems().forEach(saveOnline); clearPicked(); } }),
     h('span', { class: 'grow' }),
-    h('button', { type: 'button', class: 'btn tiny ghost', text: 'Clear', onclick: clearPicked }));
+    h('button', { type: 'button', class: 'btn tiny ghost', text: '✕ Clear', onclick: clearPicked }));
   return bar;
 }
 function clearPicked() { ONLINE.picked.clear(); paintPicked(); }
@@ -1101,7 +1119,7 @@ function ask(title, value) {
     const done = v => { box.remove(); res(v); };
     const box = h('div', { class: 'modal', onpointerdown: e => { if (e.target === box) done(null); } },
       h('form', { class: 'card', onsubmit: e => { e.preventDefault(); done(inp.value.trim() || null); } },
-        h('b', { text: title }), inp,
+        h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('edit')), h('b', { class: 'grow', text: title })), inp,
         h('div', { class: 'row end' }, h('button', { type: 'button', class: 'btn ghost', text: 'Cancel', onclick: () => done(null) }), h('button', { type: 'submit', class: 'btn primary', text: 'OK' }))));
     inp.addEventListener('keydown', e => { if (e.key === 'Escape') done(null); });
     document.body.append(box); inp.focus(); inp.select();
@@ -1132,7 +1150,7 @@ function panelPlaylists(body, leaf) {
     h('button', { type: 'button', class: 'btn tiny', text: '＋ Empty', onclick: async () => { const n = await ask('Name the new playlist', 'New playlist'); if (n) showPlaylist(newPlaylist(n.slice(0, 60))); } })));
   const ul = h('ul', { class: 'navlist' });
   for (const pl of LIB.playlists) {
-    const b = h('button', { type: 'button', class: (shown.has(pl.id) ? 'on' : '') + (E.q && E.q.plId === pl.id && E.state === 'play' ? ' playing' : ''), onclick: () => showPlaylist(pl), title: 'Show it' }, h('span', { class: 'n', text: pl.name }), h('span', { class: 'c', text: String(pl.items.length) }));
+    const b = h('button', { type: 'button', icon: 'music', class: (shown.has(pl.id) ? 'on' : '') + (E.q && E.q.plId === pl.id && E.state === 'play' ? ' playing' : ''), onclick: () => showPlaylist(pl), title: 'Show it' }, h('span', { class: 'n', text: pl.name }), h('span', { class: 'c', text: String(pl.items.length) }));
     b.dataset.plid = pl.id;
     b.oncontextmenu = e => { e.preventDefault(); popMenu(null, [
       { label: 'Play it', icon: '▶', fn: () => { const it = S().shuffle ? pl.items[Math.floor(Math.random() * pl.items.length)] : pl.items[0]; if (it) playItem(pl, it); } },
@@ -1168,8 +1186,8 @@ function panelPlaylist(body, leaf, extra) {
   body.append(h('div', { class: 'vtools' },
     h('button', { type: 'button', class: 'btn tiny primary', text: '▶ Play', onclick: () => { const it = picked()[0] || (S().shuffle ? pl.items[Math.floor(Math.random() * pl.items.length)] : pl.items[0]); if (it) playItem(pl, it); } }),
     h('button', { type: 'button', class: 'btn tiny', text: '+ Queue', title: 'Add the selected tracks (or all of them) to the queue', onclick: () => enqueue(picked().length ? picked() : pl.items) }),
-    h('button', { type: 'button', class: 'btn tiny', text: 'Add folder', onclick: async () => { const p = await desk.pickFolder(); if (p.length) addToPlaylist(pl, p); } }),
-    h('button', { type: 'button', class: 'btn tiny', text: 'Add files', onclick: async () => { const p = await desk.pickFiles(); if (p.length) addToPlaylist(pl, p); } }),
+    h('button', { type: 'button', class: 'btn tiny', text: '📁 Add folder', onclick: async () => { const p = await desk.pickFolder(); if (p.length) addToPlaylist(pl, p); } }),
+    h('button', { type: 'button', class: 'btn tiny', text: '＋ Add files', onclick: async () => { const p = await desk.pickFiles(); if (p.length) addToPlaylist(pl, p); } }),
     h('button', { type: 'button', class: 'btn tiny ghost', text: '⋯', title: 'More', onclick: e => popMenu(e.currentTarget, [
       { label: 'Look for changes in its folders', icon: '⟳', disabled: !pl.folders.length, fn: () => rescan(pl) },
       { label: 'Sort A–Z', icon: '⇅', fn: () => { pl.items.sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })); save(); renderLeaf(leaf); } },
@@ -1281,7 +1299,7 @@ function onlineTabletop(v, leaf) {
     h('input', { class: 'search', type: 'text', 'data-k': 'tq', placeholder: `Search ${all.length} tracks: tavern, storm, spaceship…`, value: ONLINE.q.tabletop, oninput: e => { ONLINE.q.tabletop = e.target.value; ONLINE.shown.tabletop = 60; renderPanels('online'); } }),
     h('select', { onchange: e => { ONLINE.tag.tabletopKind = e.target.value; renderPanels('online'); } }, ...[['', 'Ambience and music'], ['amb', 'Mostly ambience'], ['mus', 'Mostly music']].map(([k, n]) => h('option', { value: k, text: n, selected: k === kind }))),
     selectAllBtn(list), h('button', { type: 'button', class: 'btn ghost tiny', text: 'Refresh', title: 'Load the list again', onclick: () => loadCatalog('tabletop', true) })));
-  v.append(h('div', { class: 'chips' }, ...Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([g, n]) => h('button', { type: 'button', class: 'chipb' + (g === tag ? ' on' : ''), text: `${g} ${n}`, onclick: () => { ONLINE.tag.tabletop = g === tag ? '' : g; renderPanels('online'); } }))));
+  v.append(h('div', { class: 'chips' }, ...Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([g, n]) => h('button', { type: 'button', class: 'chipb' + (g === tag ? ' on' : ''), icon: 'star', text: `${g} ${n}`, onclick: () => { ONLINE.tag.tabletop = g === tag ? '' : g; renderPanels('online'); } }))));
   const grid = h('div', { class: 'tgrid' });
   for (const r of list) grid.append(h('div', { class: 'tcard' },
     h('div', { class: 'timg', style: `background-image:url("${r.img}")` }, pickBox(r), prevBtn(r, true)),
@@ -1301,7 +1319,7 @@ function onlineIncompetech(v) {
   v.append(h('div', { class: 'vtools' },
     h('input', { class: 'search', type: 'text', 'data-k': 'iq', placeholder: `Search ${all.length} pieces: medieval, tense, harp…`, value: ONLINE.q.incompetech, oninput: e => { ONLINE.q.incompetech = e.target.value; ONLINE.shown.incompetech = 80; renderPanels('online'); } }),
     selectAllBtn(list), h('button', { type: 'button', class: 'btn ghost tiny', text: 'Refresh', onclick: () => loadCatalog('incompetech', true) })));
-  v.append(h('div', { class: 'chips' }, ...Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 36).map(([f, n]) => h('button', { type: 'button', class: 'chipb' + (f === feel ? ' on' : ''), text: `${f} ${n}`, onclick: () => { ONLINE.tag.incompetech = f === feel ? '' : f; renderPanels('online'); } }))));
+  v.append(h('div', { class: 'chips' }, ...Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 36).map(([f, n]) => h('button', { type: 'button', class: 'chipb' + (f === feel ? ' on' : ''), icon: 'sparkle', text: `${f} ${n}`, onclick: () => { ONLINE.tag.incompetech = f === feel ? '' : f; renderPanels('online'); } }))));
   const box = h('div', { class: 'results' }); list.forEach(r => box.append(resultRow(r))); v.append(box);
   if (!list.length) v.append(h('p', { class: 'hint', text: 'Nothing matches.' }));
   if (match.length > list.length) v.append(h('button', { type: 'button', class: 'btn', text: `Show more (${match.length - list.length} left)`, onclick: () => { ONLINE.shown.incompetech += 80; renderPanels('online'); } }));
@@ -1370,7 +1388,7 @@ function panelWeb(body) {
     h('button', { type: 'button', class: 'btn tiny', text: 'Open', onclick: () => desk.webOpen(w.url) }),
     h('button', { type: 'button', class: 'btn tiny ghost', text: 'Remove', onclick: () => { LIB.web = LIB.web.filter(x => x !== w); save(); renderPanels('web'); } })));
   if (!LIB.web.length) list.append(tip('web', 'Save the pages you use often, like a rain sounds video or an ambience mixer.'));
-  body.append(h('div', { class: 'sec', text: 'Saved pages' }), h('div', { class: 'card' }, list, h('div', { class: 'row', style: 'margin-top:8px' }, name,
+  body.append(h('div', { class: 'sec', icon: 'web', text: 'Saved pages' }), h('div', { class: 'card' }, list, h('div', { class: 'row', style: 'margin-top:8px' }, name,
     h('button', { type: 'button', class: 'btn tiny', text: 'Save the open page', disabled: !st.open, onclick: () => { LIB.web.push({ id: uid(), url: st.url, title: name.value.trim() || st.title || st.url }); save(); renderPanels('web'); } }))));
 }
 function panelPads(body, leaf, extra) {
@@ -1385,12 +1403,12 @@ function panelPads(body, leaf, extra) {
   const inGroup = p => !st.group || p.group === st.group;
   const gcount = {}; for (const p of LIB.pads) if (p.group) gcount[p.group] = (gcount[p.group] || 0) + 1;
   if (LIB.pads.length) body.append(h('div', { class: 'chips' },
-    h('button', { type: 'button', class: 'chipb' + (!st.group ? ' on' : ''), text: `All ${LIB.pads.length}`, onclick: () => { st.group = ''; st.tag = ''; save(); renderLeaf(leaf); } }),
-    ...Object.entries(gcount).sort((a, b) => b[1] - a[1]).map(([g, n]) => h('button', { type: 'button', class: 'chipb' + (st.group === g ? ' on' : ''), text: `${g} ${n}`, onclick: () => { st.group = st.group === g ? '' : g; st.tag = ''; save(); renderLeaf(leaf); } }))));
+    h('button', { type: 'button', class: 'chipb' + (!st.group ? ' on' : ''), icon: 'pads', text: `All ${LIB.pads.length}`, onclick: () => { st.group = ''; st.tag = ''; save(); renderLeaf(leaf); } }),
+    ...Object.entries(gcount).sort((a, b) => b[1] - a[1]).map(([g, n]) => h('button', { type: 'button', class: 'chipb' + (st.group === g ? ' on' : ''), gicon: groupIcon(g), text: `${g} ${n}`, onclick: () => { st.group = st.group === g ? '' : g; st.tag = ''; save(); renderLeaf(leaf); } }))));
   const tcount = {}; for (const p of LIB.pads) if (p.tag && inGroup(p)) tcount[p.tag] = (tcount[p.tag] || 0) + 1;
   // tags show once a group is picked (or when there are only a few), so the chips stay short
   if (Object.keys(tcount).length && (st.group || Object.keys(tcount).length <= 10 || st.tag)) body.append(h('div', { class: 'chips tags' }, ...Object.entries(tcount).sort((a, b) => a[0].localeCompare(b[0])).map(([t, n]) =>
-    h('button', { type: 'button', class: 'chipb tagchip' + (st.tag === t ? ' on' : ''), style: `--tc:${tagColor(t)}`, title: 'Right-click to change its colour', text: `${t} ${n}`, onclick: () => { st.tag = st.tag === t ? '' : t; save(); renderLeaf(leaf); }, oncontextmenu: e => { e.preventDefault(); tagColorDialog(t); } }))));
+    h('button', { type: 'button', class: 'chipb tagchip' + (st.tag === t ? ' on' : ''), icon: 'star', style: `--tc:${tagColor(t)}`, title: 'Right-click to change its colour', text: `${t} ${n}`, onclick: () => { st.tag = st.tag === t ? '' : t; save(); renderLeaf(leaf); }, oncontextmenu: e => { e.preventDefault(); tagColorDialog(t); } }))));
   // a search hides every pad whose name, group or tags don't fit
   const words = padWords(q), fits = p => inGroup(p) && (!st.tag || p.tag === st.tag) && (!words.length || words.every(w => padWords([p.name, p.group, p.tag, ...(p.srcTags || [])].join(' ')).some(t => t.startsWith(w))));
   const shown = LIB.pads.filter(fits);
@@ -1453,7 +1471,7 @@ function tagColorDialog(tag) {
   const card = h('div', { class: 'card appear' });
   const set = c => { LIB.tagColors[tag] = c; save(); padsChanged(); draw(); };
   const draw = () => card.replaceChildren(
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: `Colour of "${tag}"` }), h('button', { type: 'button', class: 'ib', text: '✕', title: 'Close', onclick: () => box.remove() })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('palette')), h('b', { class: 'grow', text: `Colour of "${tag}"` }), h('button', { type: 'button', class: 'ib', text: '✕', title: 'Close', onclick: () => box.remove() })),
     h('p', { class: 'hint', text: `Every pad tagged "${tag}" takes this colour.` }),
     h('div', { class: 'swatches' }, ...TAG_COLORS.map(c => h('button', { type: 'button', class: 'sw' + (tagColor(tag).toLowerCase() === c ? ' on' : ''), style: `--c:${c}`, onclick: () => set(c) })),
       h('label', { class: 'sw custom', title: 'Any colour you like' }, ico('palette'), h('input', { type: 'color', value: tagColor(tag), oninput: e => { LIB.tagColors[tag] = e.target.value; save(); padsChanged(); }, onchange: () => draw() }))),
@@ -1467,7 +1485,7 @@ function iconPicker(p) {
   const draw = () => { const t = q.value.trim().toLowerCase(); grid.replaceChildren(...Object.keys(GI).filter(n => !t || n.includes(t)).map(n => h('button', { type: 'button', class: 'ipk' + (p.icon === n ? ' on' : ''), title: n.replace(/-/g, ' '), onclick: () => { p.icon = n; p.iconSet = true; save(); padsChanged(); box.remove(); } }, gi(n)))); };
   q.oninput = draw;
   const card = h('div', { class: 'card appear wide' },
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: `Icon for "${p.name}"` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('star')), h('b', { class: 'grow', text: `Icon for "${p.name}"` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
     h('div', { class: 'row' }, q, h('button', { type: 'button', class: 'btn', text: 'Automatic', onclick: () => { p.iconSet = false; autoTag(p); save(); padsChanged(); box.remove(); } })),
     grid, h('p', { class: 'hint', text: 'Icons by Lorc, Delapouite and others from game-icons.net, CC BY 3.0.' }));
   const box = h('div', { class: 'modal', onpointerdown: e => { if (e.target === box) box.remove(); } }, card);
@@ -1479,7 +1497,7 @@ function padsNowEl() {
   if (!list.length) return h('div', { class: 'padsnow none' });
   const armed = Date.now() < PADSTOP.until;
   return h('div', { class: 'padsnow' },
-    h('div', { class: 'qhead' }, h('div', { class: 'sec', text: `Sound pads playing (${list.length})` }), h('span', { class: 'grow' }),
+    h('div', { class: 'qhead' }, h('div', { class: 'sec', icon: 'pads', text: `Sound pads playing (${list.length})` }), h('span', { class: 'grow' }),
       h('button', { type: 'button', class: 'btn tiny ' + (armed ? 'bad armed' : 'ghost'), text: armed ? '■ Stop now' : '■ Stop all', title: 'One press fades them all out; a second press stops them at once', onclick: stopAllPads })),
     ...list.map(P => h('div', { class: 'pnow' + (P.stopping ? ' stopping' : ''), style: tagColor(P.pad.tag) ? `--tc:${tagColor(P.pad.tag)}` : '' },
       gi(P.pad.icon || 'musical-notes', 'pnico'),
@@ -1603,7 +1621,7 @@ function scapeIconPicker(d) {
   const draw = () => { const t = q.value.trim().toLowerCase(); grid.replaceChildren(...Object.keys(GI).filter(n => !t || n.includes(t)).map(n => h('button', { type: 'button', class: 'ipk' + (d.icon === n ? ' on' : ''), title: n.replace(/-/g, ' '), onclick: () => pick(n) }, gi(n)))); };
   q.oninput = draw;
   const card = h('div', { class: 'card appear wide' },
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: `Icon for "${d.name || 'Untitled'}"` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('star')), h('b', { class: 'grow', text: `Icon for "${d.name || 'Untitled'}"` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
     h('div', { class: 'row' }, q, h('button', { type: 'button', class: 'btn', text: 'From the name', onclick: () => pick(guessScapeIcon(d.name), true) })),
     grid, h('p', { class: 'hint', text: 'Icons by Lorc, Delapouite and others from game-icons.net, CC BY 3.0.' }));
   const box = h('div', { class: 'modal', onpointerdown: e => { if (e.target === box) box.remove(); } }, card);
@@ -1719,7 +1737,7 @@ function botHelp(svc) {
     'Pick the voice channel and press Join.'
   ];
   const card = h('div', { class: 'card appear wide' },
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: `A ${BOT_NAMES[svc]} bot of your own` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('headphones')), h('b', { class: 'grow', text: `A ${BOT_NAMES[svc]} bot of your own` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
     h('p', { class: 'hint', text: 'Your group hears Critter Sounds in a voice channel, through a bot that only you control. Nothing goes through anyone else\'s server, and there\'s no shared bot to get banned or rate-limited.' }),
     h('ol', { class: 'botsteps' }, ...steps.map(s => h('li', { text: s }))),
     h('p', { class: 'hint', text: 'The bot plays your mix as a live stream: playlists, pads, soundscapes and web pages, after the effects. The token is stored encrypted on this computer.' }),
@@ -1740,7 +1758,7 @@ function botToken(svc) {
   };
   tok.onkeydown = e => { if (e.key === 'Enter') go(); };
   const card = h('div', { class: 'card appear' },
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: `${BOT_NAMES[svc]} bot token` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('link')), h('b', { class: 'grow', text: `${BOT_NAMES[svc]} bot token` }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
     h('p', { class: 'hint', text: 'It\'s kept encrypted on this computer, and the bot signs in with it whenever Critter Sounds starts.' + (cfg.saved ? ' Leave it empty to keep the saved one.' : '') }),
     tok, org,
     h('div', { class: 'row end' }, h('button', { type: 'button', class: 'btn ghost', text: '? How to make a bot', onclick: () => { box.remove(); botHelp(svc); } }), h('button', { type: 'button', class: 'btn primary', text: 'Save and sign in', onclick: go })));
@@ -1827,6 +1845,7 @@ function applyTheme() {
   document.documentElement.dataset.theme = t.scheme === 'light' ? 'light' : 'dark';
   st.setProperty('--hue', (Number.isFinite(t.tint) ? t.tint : 4) + '%');
   st.setProperty('--bleed', Number.isFinite(t.bleed) ? t.bleed : 1);
+  st.setProperty('--grain', t.grain === 0 ? 0 : 1);
   applyFontSet(document.documentElement, t.fonts || 'Easy reading');
 }
 function appearance() {
@@ -1837,24 +1856,26 @@ function appearance() {
     h('label', { class: 'sw custom', title: 'Any colour you like' }, ico('palette'), h('input', { type: 'color', value: t[key], oninput: e => { t[key] = e.target.value; applyTheme(); save(); }, onchange: () => draw() })));
   const card = h('div', { class: 'card appear' });
   const draw = () => card.replaceChildren(
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: 'Appearance' }), h('button', { type: 'button', class: 'ib', text: '✕', title: 'Close', onclick: () => box.remove() })),
-    h('div', { class: 'sec', text: 'Highlight' }), h('p', { class: 'hint', text: 'Buttons, the playing track, sliders and selections.' }), swatches('accent'),
-    h('div', { class: 'sec', text: 'Second highlight' }), h('p', { class: 'hint', text: 'Previews, the level meter and other details.' }), swatches('accent2'),
-    h('div', { class: 'sec', text: 'Light or dark' }),
-    h('div', { class: 'seg' }, ...[['dark', 'Dark'], ['light', 'Light']].map(([k, l]) => h('button', { type: 'button', class: (t.scheme || 'dark') === k ? 'on' : '', text: l, onclick: () => set({ scheme: k }) }))),
-    h('div', { class: 'sec', text: 'Background' }),
-    h('div', { class: 'seg' }, ...Object.entries(TONES).map(([k, v]) => h('button', { type: 'button', class: t.tone === k ? 'on' : '', text: v.name, onclick: () => set({ tone: k }) }))),
-    h('div', { class: 'sec', text: 'Surface tint' }), h('p', { class: 'hint', text: 'How much the highlight colours the background and the windows.' }),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('palette')), h('b', { class: 'grow', text: 'Appearance' }), h('button', { type: 'button', class: 'ib', text: '✕', title: 'Close', onclick: () => box.remove() })),
+    h('div', { class: 'sec', icon: 'palette', text: 'Highlight' }), h('p', { class: 'hint', text: 'Buttons, the playing track, sliders and selections.' }), swatches('accent'),
+    h('div', { class: 'sec', icon: 'palette', text: 'Second highlight' }), h('p', { class: 'hint', text: 'Previews, the level meter and other details.' }), swatches('accent2'),
+    h('div', { class: 'sec', icon: 'moon', text: 'Light or dark' }),
+    h('div', { class: 'seg' }, ...[['dark', 'Dark', 'moon'], ['light', 'Light', 'sun']].map(([k, l, ic]) => h('button', { type: 'button', icon: ic, class: (t.scheme || 'dark') === k ? 'on' : '', text: l, onclick: () => set({ scheme: k }) }))),
+    h('div', { class: 'sec', icon: 'window', text: 'Background' }),
+    h('div', { class: 'seg' }, ...Object.entries(TONES).map(([k, v]) => h('button', { type: 'button', icon: 'square', class: t.tone === k ? 'on' : '', text: v.name, onclick: () => set({ tone: k }) }))),
+    h('div', { class: 'sec', icon: 'drop', text: 'Surface tint' }), h('p', { class: 'hint', text: 'How much the highlight colours the background and the windows.' }),
     (() => { const r = h('input', { type: 'range', min: 0, max: 14, step: 1, value: Number.isFinite(t.tint) ? t.tint : 4, 'aria-label': 'Surface tint', oninput: e => { t.tint = +e.target.value; paintRange(e.target); applyTheme(); save(); } }); paintRange(r); return r; })(),
-    h('div', { class: 'sec', text: 'Picture colour' }), h('p', { class: 'hint', text: 'How far the cover of what\'s playing spills its colours into the bar.' }),
-    h('div', { class: 'seg' }, ...[[0, 'Off'], [0.6, 'Soft'], [1, 'Full']].map(([v, l]) => h('button', { type: 'button', class: (Number.isFinite(t.bleed) ? t.bleed : 1) === v ? 'on' : '', text: l, onclick: () => set({ bleed: v }) }))),
-    h('div', { class: 'sec', text: 'Fonts' }),
+    h('div', { class: 'sec', icon: 'image', text: 'Picture colour' }), h('p', { class: 'hint', text: 'How far the cover of what\'s playing spills its colours into the bar.' }),
+    h('div', { class: 'seg' }, ...[[0, 'Off'], [0.6, 'Soft'], [1, 'Full']].map(([v, l]) => h('button', { type: 'button', icon: 'image', class: (Number.isFinite(t.bleed) ? t.bleed : 1) === v ? 'on' : '', text: l, onclick: () => set({ bleed: v }) }))),
+    h('div', { class: 'sec', icon: 'grain', text: 'Film grain' }), h('p', { class: 'hint', text: 'A fine grain over the background, like film.' }),
+    h('div', { class: 'seg' }, ...[[0, 'Off'], [1, 'On']].map(([v, l]) => h('button', { type: 'button', icon: 'grain', class: (t.grain ?? 1) === v ? 'on' : '', text: l, onclick: () => set({ grain: v }) }))),
+    h('div', { class: 'sec', icon: 'font', text: 'Fonts' }),
     h('div', { class: 'fontsets', role: 'radiogroup', 'aria-label': 'Fonts' }, ...FONT_SETS.map(([n, d, u]) => {
       const on = (t.fonts || 'Easy reading') === n, b = h('button', { type: 'button', role: 'radio', 'aria-checked': String(on), class: 'fontset' + (on ? ' on' : ''), onclick: () => set({ fonts: n }) },
         h('small', { text: n }), h('b', { text: 'The dragon rolls a 20' }), h('span', { text: d === u ? d : `${d} + ${u}` }));
       applyFontSet(b, n); return b;
     })),
-    h('div', { class: 'row end' }, h('button', { type: 'button', class: 'btn ghost', text: 'Back to Critter Sounds colours', onclick: () => set({ ...DEF().theme }) }), h('button', { type: 'button', class: 'btn primary', text: 'Done', onclick: () => box.remove() })));
+    h('div', { class: 'row end' }, h('button', { type: 'button', class: 'btn ghost', text: '⟳ Back to Critter Sounds colours', onclick: () => set({ ...DEF().theme }) }), h('button', { type: 'button', class: 'btn primary', text: '✓ Done', onclick: () => box.remove() })));
   const box = h('div', { class: 'modal', onpointerdown: e => { if (e.target === box) box.remove(); } }, card);
   draw(); document.body.append(box);
 }
@@ -1949,7 +1970,7 @@ function panelYouTube(body, leaf, extra) {
     h('button', { type: 'button', class: 'btn tiny', text: 'Add to playlist ▾', onclick: e => choosePlaylist(e.currentTarget, pl => { ytDo(picked(), 'playlist', pl); clear(); }) }),
     h('button', { type: 'button', class: 'btn tiny', text: 'Make sound pads', onclick: () => { ytDo(picked(), 'pads'); clear(); } }),
     h('button', { type: 'button', class: 'btn tiny ghost', text: '⭳ Just download', onclick: () => { ytDo(picked()); clear(); } }),
-    h('span', { class: 'grow' }), h('button', { type: 'button', class: 'btn tiny ghost', text: 'Clear', onclick: clear })));
+    h('span', { class: 'grow' }), h('button', { type: 'button', class: 'btn tiny ghost', text: '🗑 Clear', onclick: clear })));
   else if (YT.res.length > 1) body.append(h('div', { class: 'row', style: 'margin-bottom:8px' }, h('button', { type: 'button', class: 'btn tiny ghost', text: 'Select all', onclick: () => { YT.res.forEach(r => YT.picked.set(r.id, r)); renderPanels('youtube'); } })));
   const box = h('div', { class: 'ytlist' });
   for (const r of YT.res) {
@@ -1973,7 +1994,7 @@ function panelYouTube(body, leaf, extra) {
 }
 
 function panelEffects(body, leaf, extra) {
-  extra.append(h('button', { type: 'button', class: 'btn tiny ghost', text: 'Reset', onclick: () => { S().fx = mfxDefaults(); fxChanged(); renderPanels('effects'); } }));
+  extra.append(h('button', { type: 'button', class: 'btn tiny ghost', text: '⟳ Reset', onclick: () => { S().fx = mfxDefaults(); fxChanged(); renderPanels('effects'); } }));
   body.append(tip('effects', 'They run on each player\'s computer, so everyone hears them, and players can turn them off for themselves.'));
   const fx = S().fx, box = h('div', { class: 'fxgrid' });
   const slider = (label, k, p, min, max, stepv, show) => h('div', { class: 'sl' }, h('span', { text: label }),
@@ -1991,7 +2012,7 @@ function panelEffects(body, leaf, extra) {
     autopan: () => [slider('Speed', 'autopan', 'speed', 0.05, 4, 0.05, v => v.toFixed(2) + 'Hz'), slider('Depth', 'autopan', 'depth', 0, 1, 0.01, pct)],
     width: () => [slider('Width', 'width', 'w', 0, 2, 0.01, v => (v < 0.04 ? 'mono' : Math.round(v * 100) + '%'))]
   };
-  body.append(h('div', { class: 'fxpre' }, h('span', { class: 'hint', text: 'Presets' }), ...FX_PRESETS.map(([n, d, fx]) => h('button', { type: 'button', class: 'chipb', title: d, text: n, onclick: () => { S().fx = presetFx(fx); fxChanged(); renderPanels('effects'); toast(`Effects: ${n}`); } }))));
+  body.append(h('div', { class: 'fxpre' }, h('span', { class: 'hint', text: 'Presets' }), ...FX_PRESETS.map(([n, d, fx]) => h('button', { type: 'button', class: 'chipb', icon: 'sparkle', title: d, text: n, onclick: () => { S().fx = presetFx(fx); fxChanged(); renderPanels('effects'); toast(`Effects: ${n}`); } }))));
   for (const [k, name] of MFX_LIST) {
     const cb = h('input', { type: 'checkbox', checked: fx[k].on, onchange: e => { fx[k].on = e.target.checked; card.classList.toggle('on', fx[k].on); fxChanged(); } });
     const card = h('div', { class: 'fx' + (fx[k].on ? ' on' : '') }, h('label', { class: 'fxh' }, cb, h('span', { text: name })),
@@ -2251,13 +2272,14 @@ async function settings() {
   if (document.querySelector('.modal')) return;
   closeMenu();
   const s = S(), dir = await desk.csDir().catch(() => ({ dir: '' })), upd = desk.updates ? await desk.updates.get().catch(() => null) : null;
-  const sec = (title, ...kids) => h('section', { class: 'setsec' }, h('div', { class: 'sec', text: title }), ...kids);
+  const SETSEC = { General: 'gear', Sound: 'sliders', Folders: 'folder', Connection: 'link', 'Tips and help': 'help', Reset: 'refresh' };
+  const sec = (title, ...kids) => h('section', { class: 'setsec' }, h('div', { class: 'sec', icon: SETSEC[title] || 'sliders', text: title }), ...kids);
   const chk = (label, sub, get, set) => h('label', { class: 'setchk' }, h('input', { type: 'checkbox', checked: !!get(), onchange: e => { set(e.target.checked); save(); } }), h('span', {}, h('b', { text: label }), sub ? h('small', { text: sub }) : null));
   const slider = (label, key, min, max, stepv, show) => h('div', { class: 'sl' }, h('span', { text: label }),
     h('input', { type: 'range', min, max, step: stepv, value: s[key], oninput: e => { s[key] = +e.target.value; e.target.nextSibling.textContent = show(s[key]); save(); if (key === 'prevVol' && ONLINE.preview) ONLINE.preview.volume = s.prevVol; } }), h('output', { text: show(s[key]) }));
   const dirLine = h('code', { class: 'setpath notr', text: dir.dir });
   const card = h('div', { class: 'card appear wide setc' },
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: 'Settings' }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('gear')), h('b', { class: 'grow', text: 'Settings' }), h('button', { type: 'button', class: 'ib', text: '✕', onclick: () => box.remove() })),
     h('div', { class: 'setbody' },
       sec('General',
         h('div', { class: 'setrow' }, h('span', { text: 'Language' }), h('select', { onchange: async e => { s.lang = e.target.value; await desk.saveLib(LIB).catch(() => {}); await desk.reloadAll(); } },
@@ -2313,7 +2335,7 @@ function renderQueue() {
   const keep = box.querySelector('.qlist') ? box.querySelector('.qlist').scrollTop : 0, af = document.activeElement && box.contains(document.activeElement) && document.activeElement.dataset.k ? document.activeElement : null, afv = af && [af.value, af.selectionStart];
   const c = E.cur, playingNow = c && c.item && E.state !== 'stop';
   const nowBox = h('div', { class: 'qnow' + (playingNow ? '' : ' idle') },
-    h('div', { class: 'sec', text: 'Now playing' }),
+    h('div', { class: 'sec', icon: 'play', text: 'Now playing' }),
     h('div', { class: 'qt', text: playingNow ? c.item.title : 'Nothing' }),
     h('div', { class: 'hint', text: playingNow ? (c.kind === 'web' ? 'From a web page' : [c.item.source || (E.q && plById(E.q.plId) && keyOf(c.item) && plById(E.q.plId).items.some(i => i.id === c.item.id) ? plById(E.q.plId).name : 'This computer'), c.item.license].filter(Boolean).join(' · ')) : LIB.queue.length ? 'Press play to start the queue.' : 'Play a track, or add some to the queue.' }));
   const list = h('ol', { class: 'qlist' });
@@ -2347,12 +2369,12 @@ function renderQueue() {
   };
   add.onkeydown = e => { if (e.key === 'Enter') { const b = found.querySelector('.qfb'); if (b) b.click(); } if (e.key === 'Escape') { add.value = ''; found.replaceChildren(); } };
   box.replaceChildren(...[nowBox,
-    h('div', { class: 'qhead' }, h('div', { class: 'sec', text: `Up next${LIB.queue.length ? ` (${LIB.queue.length})` : ''}` }), h('span', { class: 'grow' }),
-      LIB.queue.length ? h('button', { type: 'button', class: 'btn tiny ghost', text: 'Shuffle', onclick: () => { LIB.queue = shuffled(LIB.queue); save(); queueChanged(); } }) : null,
-      LIB.queue.length ? h('button', { type: 'button', class: 'btn tiny ghost', text: 'Clear', onclick: () => { LIB.queue = []; save(); queueChanged(); } }) : null),
+    h('div', { class: 'qhead' }, h('div', { class: 'sec', icon: 'queue', text: `Up next${LIB.queue.length ? ` (${LIB.queue.length})` : ''}` }), h('span', { class: 'grow' }),
+      LIB.queue.length ? h('button', { type: 'button', class: 'btn tiny ghost', text: '🔀 Shuffle', onclick: () => { LIB.queue = shuffled(LIB.queue); save(); queueChanged(); } }) : null,
+      LIB.queue.length ? h('button', { type: 'button', class: 'btn tiny ghost', text: '🗑 Clear', onclick: () => { LIB.queue = []; save(); queueChanged(); } }) : null),
     add, found,
     LIB.queue.length ? list : h('div', { class: 'qempty', text: 'The queue is empty. Use + Queue on a track or an online result, or drag tracks here.' }),
-    then.length ? h('div', { class: 'qthen' }, h('div', { class: 'sec', text: `Then from ${ctx.pl.name}${S().shuffle ? ' (shuffled)' : ''}` }), ...then.map(it => h('div', { class: 'qti', title: 'Double-click to play it now', ondblclick: () => playItem(ctx.pl, it) }, h('span', { text: it.title }), h('span', { class: 'hint', text: it.dur ? fmt(it.dur) : '' })))) : null, padsNowEl()].filter(Boolean));
+    then.length ? h('div', { class: 'qthen' }, h('div', { class: 'sec', icon: 'music', text: `Then from ${ctx.pl.name}${S().shuffle ? ' (shuffled)' : ''}` }), ...then.map(it => h('div', { class: 'qti', title: 'Double-click to play it now', ondblclick: () => playItem(ctx.pl, it) }, h('span', { text: it.title }), h('span', { class: 'hint', text: it.dur ? fmt(it.dur) : '' })))) : null, padsNowEl()].filter(Boolean));
   const ql = box.querySelector('.qlist'); if (ql) ql.scrollTop = keep;
   if (afv) { add.value = afv[0]; add.focus(); try { add.setSelectionRange(afv[1], afv[1]); } catch {} add.oninput(); }
   box.ondragover = e => { if (e.dataTransfer.types.includes('text/x-cbm') || e.dataTransfer.types.includes('text/x-q')) { e.preventDefault(); box.classList.add('dropzone'); } };
@@ -2421,6 +2443,7 @@ function paintArt(c) {
 }
 function paint() {
   const c = E.cur, st = E.state;
+  queueMicrotask(() => { for (const b of document.querySelectorAll('#bar .tb')) if (b.title) b.setAttribute('aria-label', b.title); });
   paintArt(c);
   $('#nowTitle').textContent = c && c.item ? c.item.title : 'Nothing playing';
   const pl = E.q && plById(E.q.plId), fromPl = pl && c && c.item && pl.items.some(i => i.id === c.item.id);
@@ -2486,6 +2509,7 @@ function bind() {
   $('#appMenu').onclick = () => { const r = $('#appMenu').getBoundingClientRect(); desk.winCmd('menu', { x: r.left, y: r.bottom }); };
   $('.wb-min').onclick = () => desk.winCmd('min'); $('.wb-max').onclick = () => desk.winCmd('max'); $('.wb-close').onclick = () => desk.winCmd('close');
   desk.onWinState(s => { document.body.classList.toggle('wmax', !!s.max); document.body.classList.toggle('wblur', !s.focus); document.body.classList.toggle('wfull', !!s.full); $('.wb-max').title = $('.wb-max').ariaLabel = s.max ? 'Restore' : 'Maximize'; });
+  setLabel($('#connBtn'), '🔗 Connect');
   $('#openBtn').onclick = e => windowMenu(e.currentTarget);
   $('#helpBtn').onclick = e => helpMenu(e.currentTarget);
   $('#folderBtn').onclick = () => desk.scape.folder('');

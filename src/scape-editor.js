@@ -13,6 +13,8 @@ function h(tag, props, ...kids) {
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else if (k in e && k !== 'list') e[k] = v; else e.setAttribute(k, v === true ? '' : v);
   }
   for (const c of kids.flat()) if (c !== null && c !== undefined && c !== false) e.append(c);
+  // an icon-only button says what it does to screen readers too
+  if (tag === 'button' && e.title && !e.getAttribute('aria-label') && !e.textContent.replace(/[^p{L}p{N}]/gu, '')) e.setAttribute('aria-label', e.title);
   return e;
 }
 const F = 'fill="currentColor" stroke="none"';
@@ -422,7 +424,7 @@ function paintTop() {
   $('#winTitle').textContent = doc.name || 'Untitled soundscape';
 }
 $('#playB').onclick = playStop;
-$('#fitB').replaceChildren(ico('fit')); $('#fitB').onclick = fit;
+$('#fitB').replaceChildren(ico('fit')); $('#fitB').setAttribute('aria-label', $('#fitB').title); $('#scIcon').setAttribute('aria-label', $('#scIcon').title); $('#fitB').onclick = fit;
 $('#renderB').replaceChildren(ico('download'), h('span', { text: 'Render a loop' })); $('#renderB').onclick = renderDialog;
 $('#helpB').replaceChildren(ico('help'), h('span', { text: 'Help' })); $('#helpB').onclick = e => helpMenu2(e.currentTarget);
 $('#scName').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
@@ -462,7 +464,7 @@ function renderDialog() {
     busy = false; go.disabled = false;
   };
   const card = h('div', { class: 'card appear' },
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: 'Render a loop' }), btn('ib', 'x', '', { onclick: () => { if (!busy) box.remove(); } })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('download')), h('b', { class: 'grow', text: 'Render a loop' }), btn('ib', 'x', '', { onclick: () => { if (!busy) box.remove(); } })),
     h('p', { class: 'hint', text: 'Plays the soundscape here, silently and faster than real time, and saves it as a WAV file that loops without a seam: the end is crossfaded into the start. It goes to Music › Critter Sounds › Loops, ready for a playlist, a pad, or any other player.' }),
     h('label', { class: 'rl' }, h('span', { text: 'Length' }), len, lenOut),
     h('label', { class: 'rl' }, h('span', { text: 'Seam crossfade' }), xfR, xfOut),
@@ -478,7 +480,7 @@ function help() {
   if (document.querySelector('.modal')) return;
   const sw = (k, t) => h('span', { class: 'hk' }, h('i', { class: 'dot k-' + k }), h('span', { text: t }));
   const card = h('div', { class: 'card appear wide helpc' },
-    h('div', { class: 'row' }, h('b', { class: 'grow', text: 'How soundscapes work' }), btn('ib', 'x', '', { onclick: () => box.remove() })),
+    h('div', { class: 'row dlgh' }, h('span', { class: 'dlgb' }, ico('help')), h('b', { class: 'grow', text: 'How soundscapes work' }), btn('ib', 'x', '', { onclick: () => box.remove() })),
     h('p', { text: 'Nodes make, shape and steer sound. Drag from an output dot (on the right of a node) to an input dot (on the left) to patch them together. Let go on empty space to pick a node that plugs in there. Drag a cable off an input to unplug it; double-click a cable to remove it.' }),
     h('div', { class: 'hkeys' }, sw('sig', 'Sound'), sw('ctl', 'Control: a slow number, about −1 to 1'), sw('trig', 'Trigger: "now!"')),
     h('p', { text: 'A control wired into a knob\'s dot swings that knob: an LFO into a Filter\'s Sweep makes wind that rises and falls; a Drift into a Bed\'s Volume makes rain that comes and goes. Triggers from a Clock, Sometimes or Sequencer play Samples, and can pass through Chance, Wait, Every Nth or Pick one first.' }),
