@@ -82,7 +82,8 @@ function ico(name, cls) {
 }
 // "▶ Play" becomes the play icon and the word; a lone symbol becomes just the icon
 function setLabel(el, text) {
-  const m = /^(\S+)(?:\s+(.+))?$/.exec(String(text)), n = m && iconName(m[1]);
+  // only a symbol in front ("▶ Play") becomes an icon; a plain word that happens to name one ("music 298") stays text
+  const m = /^(\S+)(?:\s+(.+))?$/.exec(String(text)), n = m && !/^\p{L}+$/u.test(m[1]) && iconName(m[1]);
   if (!n) { el.textContent = text; return; }
   el.replaceChildren(ico(n), ...(m[2] ? [Object.assign(document.createElement('span'), { textContent: m[2] })] : []));
   el.classList.toggle('icon-only', !m[2]);

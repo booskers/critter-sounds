@@ -122,3 +122,33 @@ body.wiring .dot:not(.can){opacity:.35}
 .node.missing{border-color:var(--line-strong,var(--line))}
 .sndb{border-color:transparent;background:var(--hover-2,var(--hover))}.sndb.empty{border:1px dashed var(--line-strong,var(--line))}
 #stop .sci{border-color:transparent;background:var(--hover-2,var(--hover))}
+
+/* The node graph in the design standard: nodes are lifted cards (surface 2, elevation, no outline or stripe), their
+   kind shown by a tinted header with an icon badge; sliders and fields are the standard ones; the palette is a side
+   panel on surface 1 without a divider; menus float on surface 3. Cable colours stay: blue sound, amber control,
+   pink triggers. */
+#cv{background-color:var(--surface-0);background-image:radial-gradient(circle,var(--line) 1px,transparent 1.3px)}
+#pal{border-right:0;background:var(--surface-1)}
+.pcat{color:var(--ink-3);font-size:var(--fs-2xs,10.5px)}
+.pitem{border-radius:var(--r-sm,7px)}.pitem:hover{background:var(--hover-2)}
+#stop{border-bottom:0;background:transparent}
+.node{background:var(--surface-2);border:0;border-radius:var(--r-lg,14px);box-shadow:var(--shadow-2,0 14px 30px -16px rgba(0,0,0,.9)),var(--sheen,none);overflow:visible}
+.node::before{display:none}
+.node.sel{box-shadow:0 0 0 2px color-mix(in oklab,var(--cc) 75%,transparent),var(--shadow-2,0 18px 40px -18px rgba(0,0,0,.95))}
+.nh{border-bottom:0;margin-bottom:6px;padding:7px 6px 7px 8px;border-radius:var(--r-lg,14px) var(--r-lg,14px) 0 0;background:linear-gradient(160deg,color-mix(in oklab,var(--cc) 26%,transparent),color-mix(in oklab,var(--cc) 6%,transparent))}
+.nh>.ico{display:grid;place-items:center;width:24px;height:24px;border-radius:var(--r-sm,7px);background:color-mix(in oklab,var(--cc) 22%,transparent);color:var(--cc)}
+.nh>.ico svg{width:14px;height:14px}
+.nh b{font-family:var(--font-display,inherit);font-weight:var(--fw-display,700);color:var(--ink)}
+:root[data-theme=light] .nh>.ico,:root[data-theme=light] .pitem .ico,:root[data-theme=light] .qai .ico{color:oklch(from var(--cc) min(l,.5) c h)}
+.prm{color:var(--ink-2)}
+/* the standard slider: accent to accent-2, a white thumb with an accent ring that glows on hover */
+.prm input[type=range]::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--accent),color-mix(in oklab,var(--accent),var(--accent-2) 60%) var(--p),var(--press) var(--p))}
+.prm input[type=range]::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--accent)}
+.prm input[type=range]:hover::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--accent),0 0 10px var(--accent)}
+textarea.code{background:var(--sunken);border:0;box-shadow:inset 0 0 0 1px var(--field-ring,transparent);border-radius:var(--r-md,10px)}
+textarea.code:focus{box-shadow:inset 0 0 0 1px var(--accent),0 0 0 3px var(--accent-soft)}
+.dot{background:var(--surface-2)}
+.nerr{color:var(--bad)}
+#cvHint{border:0;background:var(--surface-2);border-radius:var(--r-lg,14px);box-shadow:var(--shadow-2,none);color:var(--ink-2)}
+.qa,.menu.smenu{border:0;background:var(--surface-3);border-radius:var(--r-xl,18px);box-shadow:var(--shadow-3),var(--sheen,none)}
+.qai{border-radius:var(--r-sm,7px)}.qai.on,.qai:hover{background:var(--accent-soft)}

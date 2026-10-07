@@ -764,3 +764,33 @@ body.playing .tb.big{animation:none}
 .pvb.big:hover{color:var(--ink)}
 .pvb.big.on{background:var(--accent-2);color:var(--on-accent-2,var(--accent2-ink))}
 :root[data-theme=light] .pvb.big{color:var(--accent-2-text)}
+
+/* Sound pads, as the design standard draws them: each pad's own colour (--c, its tag colour) as a soft gradient over
+   the surface with a thin top light, no border or stripe; the game icon in that colour, glowing only on hover; the
+   label in --ink. Playing pads hold the stronger gradient and a ring in their colour. */
+.pad{--c:var(--tc);border:0;border-radius:var(--r-lg,14px);background:linear-gradient(160deg,color-mix(in oklab,var(--c) 26%,transparent),color-mix(in oklab,var(--c) 8%,transparent));box-shadow:inset 0 1px 0 color-mix(in oklab,var(--c) 30%,transparent);transition:background var(--dur,180ms),box-shadow var(--dur,180ms)}
+.pad::before{display:none}
+.pad:hover{border-color:transparent;background:linear-gradient(160deg,color-mix(in oklab,var(--c) 36%,transparent),color-mix(in oklab,var(--c) 12%,transparent))}
+.pad:active{transform:none}
+.pad.playing{background:linear-gradient(160deg,color-mix(in oklab,var(--c) 42%,transparent),color-mix(in oklab,var(--c) 16%,transparent));box-shadow:inset 0 1px 0 color-mix(in oklab,var(--c) 40%,transparent),inset 0 0 0 2px var(--c)}
+.padico{width:auto;height:auto;border-radius:0;background:none;box-shadow:none;color:var(--c);justify-self:start;transition:filter var(--dur,180ms)}
+.padico svg{width:30px;height:30px}
+.pad:hover .padico{box-shadow:none;filter:drop-shadow(0 0 6px color-mix(in oklab,var(--c) 60%,transparent))}
+.pad .pn{color:var(--ink);font-weight:var(--fw-bold,680)}
+.pad.small .padico{justify-self:center}.pad.small .padico svg{width:24px;height:24px}
+:root[data-theme=light] .padico,:root[data-theme=light] .pad .lp{color:oklch(from var(--c) min(l,.55) c h)}
+@media (prefers-reduced-motion:reduce){.pad.playing .padico{animation:none}}
+/* Soundscape tiles: a lifted card (surface 2); the playing one in the accent's soft fill, its icon glowing only on hover */
+.stile,.stile.on{border:0;box-shadow:var(--sheen,none)}
+.stile{background:var(--surface-2)}
+.stile.on{background:linear-gradient(160deg,var(--accent-soft),var(--surface-2) 70%)}
+.stile .sic{border:0;border-radius:var(--r-md,10px);background:var(--accent-soft);color:var(--accent-text);transition:box-shadow var(--dur,180ms)}
+.stile.on .sic{background:var(--accent);color:var(--on-accent);box-shadow:none}
+.stile .sic:hover,.stile.on .sic:hover{box-shadow:0 0 16px -2px color-mix(in oklab,var(--accent) 70%,transparent)}
+.stile .smac{border-top:0;padding-top:2px}
+.stile.add{background:transparent;border:1.5px dashed var(--line-strong,var(--line));box-shadow:none}
+.stile.add:hover{border-color:var(--accent);transform:none}
+/* on the pads' coloured gradients, tags and key numbers keep AA */
+.ptags .pt{color:color-mix(in oklab,var(--tc) 50%,white)}
+:root[data-theme=light] .ptags .pt{color:oklch(from var(--tc) min(l,.42) c h)}
+.pad .k{color:var(--ink)}
