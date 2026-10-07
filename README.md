@@ -66,6 +66,12 @@ On a phone (720px wide or less) it becomes one screen at a time with a tab bar, 
 
 Every gesture also has a button. Settings › Screen layout picks the layout by hand.
 
+### Android
+
+`android/` is a small app around the web version (no Gradle; it needs Java 17 and the Android SDK): `python android/build.py` makes `android/dist/Critter-Sounds.apk` and `critter-sounds-android.json`. The signing key is made on the first build in `%USERPROFILE%\.critter\critter-sounds.jks`; keep it, because Android only installs updates signed with the same key. Attach both files to every release: the app updates itself from the latest one. Raise `versionCode` in `android/AndroidManifest.xml` for a new APK.
+
+The icons for phones and browsers (the mark on the dark tone) come from `node logo-src/app-icon.mjs`.
+
 ### Nearby: one Critter Sounds controls another
 
 Critter Sounds finds the others on the same network through Homebase's `lan` room (same public address, or a pairing code), and lists them under **Nearby**. Any of them can ask to control a desktop app; the desktop shows who's asking and a 4-digit code that must match, and nothing happens until someone there presses **Allow**. They then connect directly with WebRTC and no STUN or TURN server, keeping only local-network addresses, so everything after the handshake stays on the network (`src/lan.js`). The controlling side shows the desktop's library and plays, queues and downloads there; downloads are saved on the desktop only.

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12 and later: the system's launch screen, the mark on the dark tone, until the page has drawn -->
+    <style name="CritterTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/critter_tone</item>
+        <item name="android:statusBarColor">@color/critter_tone</item>
+        <item name="android:navigationBarColor">@color/critter_tone</item>
+        <item name="android:colorAccent">#FF8800FF</item>
+        <item name="android:windowSplashScreenBackground">@color/critter_tone</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+    </style>
+</resources>
