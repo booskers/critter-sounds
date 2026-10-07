@@ -794,3 +794,6 @@ body.playing .tb.big{animation:none}
 .ptags .pt{color:color-mix(in oklab,var(--tc) 50%,white)}
 :root[data-theme=light] .ptags .pt{color:oklch(from var(--tc) min(l,.42) c h)}
 .pad .k{color:var(--ink)}
+
+/* the version under the big logos (the empty canvas, the setup) */
+.appver{display:block;text-align:center;font:600 12px/1 var(--font-ui,inherit);letter-spacing:.1em;color:var(--ink-3,var(--muted));margin:-2px 0 8px}

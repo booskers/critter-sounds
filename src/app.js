@@ -1050,6 +1050,7 @@ function emptyCanvas() {
   const logo = document.querySelector('#top .brand svg');
   return h('div', { class: 'blank first' },
     h('div', { class: 'blogo' }, logo ? logo.cloneNode(true) : h('span', { class: 'logomark', 'aria-hidden': 'true' })),
+    window.APP_VERSION ? h('span', { class: 'appver notr', text: 'Version ' + window.APP_VERSION }) : null,
     h('h2', { text: 'Nothing here' }),
     h('p', { class: 'lead', text: 'Click on Windows to add your first window, or select a layout.' }),
     h('div', { class: 'row center' },
@@ -2215,7 +2216,7 @@ function onboarding() {
   const skip = () => { box.remove(); S().onboarded = true; save(); toast('Setup skipped. Help › Setup brings it back.'); };
   const choice = (key, val, icon, title, sub, extra) => h('button', { type: 'button', class: 'onbch' + (st[key] === val ? ' on' : ''), onclick: () => { st[key] = val; draw(); } }, h('span', { class: 'oi' }, ico(icon)), h('span', { class: 'ot' }, h('b', { text: title }), h('span', { text: sub })), extra || null);
   const STEPS = [
-    () => [h('div', { class: 'onblogo' }, (document.querySelector('#top .brand svg') || h('span')).cloneNode(true)),
+    () => [h('div', { class: 'onblogo' }, (document.querySelector('#top .brand svg') || h('span')).cloneNode(true)), window.APP_VERSION ? h('span', { class: 'appver notr', text: 'Version ' + window.APP_VERSION }) : null,
       h('h2', { text: 'Welcome to Critter Sounds' }),
       h('p', { text: 'Music, sound effects and ambience for your tabletop game, played live to everyone at your table: in Critter VTT, or in a Discord or Fluxer voice channel.' }),
       h('p', { class: 'hint', text: 'Three quick questions set it up for you. You can skip, and change everything later.' })],

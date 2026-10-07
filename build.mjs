@@ -48,5 +48,7 @@ await copyFile(join(here, 'src', 'icon.svg'), join(out, 'icon.svg'));
 // the sound pad icons from game-icons.net (CC BY 3.0), fetched once by fetch-gameicons.mjs
 await copyFile(join(here, 'src', 'gameicons.json'), join(out, 'gameicons.json'));
 await writeFile(join(out, 'index.html'), (await readFile(join(here, 'src', 'index.html'), 'utf8')).replace('<!--LOGO-->', () => logo));
-await writeFile(join(out, 'config.js'), `window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)};\n`);
+// the version shows under the big logos; it comes from package.json
+const version = JSON.parse(await readFile(join(here, 'package.json'), 'utf8')).version;
+await writeFile(join(out, 'config.js'), `window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)};\nwindow.APP_VERSION = ${JSON.stringify(version)};\n`);
 console.log(`www ready: Homebase ${cfg.server ? 'at ' + cfg.server : 'not configured (the app will ask)'}, effects ${(fxCode.length / 1024).toFixed(0)} KB, shared code from ${from}`);
