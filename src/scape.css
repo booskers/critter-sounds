@@ -1,6 +1,9 @@
 /* the soundscape editor: a bar on top, the node list on the left, and the canvas */
 body.scape{--sig:var(--accent2);--ctl:#fbbf24;--trig:#ec4899}
 #stop{flex:none;display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);position:relative;z-index:2;background:color-mix(in srgb,var(--bg) 70%,var(--panel))}
+/* the see-through title bar lies over the top of the window (style.css): the toolbar starts below it, as #top does */
+body>#titlebar~#stop{padding-top:44px}
+body.wfull #stop{padding-top:10px}
 #stop .sci{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--hover);color:var(--accent-hi);display:grid;place-items:center;padding:0;cursor:default}
 #stop .sci .gi svg{width:24px;height:24px;display:block}
 body.live #stop .sci{background:var(--accent);color:var(--accent-ink);border-color:transparent;animation:scpulse 2.6s ease-in-out infinite}
