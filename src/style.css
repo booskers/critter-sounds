@@ -1011,3 +1011,17 @@ body:is(.phone,.tablet) .mini-chk{min-height:44px;display:inline-flex;align-item
 body:is(.phone,.tablet) .mini-chk input{width:22px;height:22px}
 body:is(.phone,.tablet) .btn.tiny{min-width:44px;justify-content:center}
 :root[data-theme=light] .deskchip{color:color-mix(in oklab,var(--accent-text,var(--accent)) 72%,black)}
+
+/* ===================== the web version on a touch screen behaves like an app, not a web page ===================== */
+/* no double-tap zoom anywhere (touch-action isn't inherited, and every scrolling list starts afresh, so it goes on
+   everything; the swipe areas' own pan-y and none still win), no grey flash on a tap, no rubber-banding of the page */
+html:has(body.web){overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body.web{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+:where(body.web),:where(body.web) *{touch-action:manipulation}
+@media (any-pointer:coarse){
+  /* no text to select or copy, and no callout on a long press: only fields take text */
+  body.web,body.web *:not(input):not(textarea):not([contenteditable]){-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important}
+  body.web :is(input,textarea,[contenteditable]){-webkit-user-select:text!important;user-select:text!important}
+  /* images and links aren't dragged out of the app */
+  body.web :is(img,a,svg){-webkit-user-drag:none}
+}

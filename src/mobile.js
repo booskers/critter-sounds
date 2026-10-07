@@ -24,18 +24,21 @@
   const MOB = window.MOB = { on: false, tabOn: false, mode: null, tab: 'music', tsec: 'music', stack: [], roots: {}, byId: {}, sheet: false, n: 0 };
   const touchy = () => MOB.on || MOB.tabOn;
   const COARSE = matchMedia('(pointer: coarse)');
+  // an iPad says it's a Mac; its touch points give it away
+  const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+  const touchScreen = () => COARSE.matches || IOS;
   // phone, tablet or the desktop's windows ('')
   function wantMode() {
     const p = (typeof LIB !== 'undefined' && LIB.set && LIB.set.screen) || 'auto';
     if (p === 'phone' || p === 'tablet') return p; if (p === 'desktop') return '';
     if (innerWidth <= 720) return 'phone';
-    return innerWidth <= 1366 && COARSE.matches ? 'tablet' : '';
+    return innerWidth <= 1400 && touchScreen() ? 'tablet' : '';
   }
   const el = {};
   // no glimpse of the desktop layout while the library loads
   { const m = wantMode(); if (m) document.body.classList.add(m); }
   const vib = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
-  const iosBrowser = /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone && !matchMedia('(display-mode: standalone)').matches;
+  const iosBrowser = IOS && !navigator.standalone && !matchMedia('(display-mode: standalone)').matches;
 
   /* ---------- the shell ---------- */
   function build() {
@@ -275,6 +278,8 @@
     const done = () => { clearTimeout(t); removeEventListener('pointermove', mv, true); removeEventListener('pointerup', done, true); removeEventListener('pointercancel', done, true); };
     addEventListener('pointermove', mv, true); addEventListener('pointerup', done, true); addEventListener('pointercancel', done, true);
   }, true);
+  // a double tap is two taps, as in an iOS app: no double-click behaviour from a finger (a tap already plays a track)
+  addEventListener('dblclick', e => { if (touchy() && Date.now() - lastTouch < 1500) { e.preventDefault(); e.stopPropagation(); } }, true);
   // Android sends its own on a long press: ours is the one that counts
   addEventListener('contextmenu', e => { if (touchy() && e.isTrusted && Date.now() - lastTouch < 1500) { e.preventDefault(); e.stopPropagation(); } }, true);
 

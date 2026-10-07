@@ -43,7 +43,7 @@ const fxCode = await readFile(join(shared, 'musicfx.js'), 'utf8');
 await copyFile(join(shared, 'musicfx.js'), join(out, 'musicfx.js'));
 
 // the player, and the soundscape editor that opens in a window of its own
-for (const f of [...(WEB ? ['desk-web.js', 'manifest.webmanifest'] : []), 'desk-boot.js', 'lan.js', 'mobile.js', 'style.css', 'app.js', 'fxpresets.js', 'scape.js', 'scape.html', 'scape-editor.js', 'scape.css', 'pcmtap.js', 'tour.js', 'i18n.js', 'i18n-de.js', 'i18n-de2.js', 'i18n-de3.js', 'notes-bridge.js', 'fonts.js',
+for (const f of [...(WEB ? ['desk-web.js', 'manifest.webmanifest', 'app-icon.png'] : []), 'desk-boot.js', 'lan.js', 'mobile.js', 'style.css', 'app.js', 'fxpresets.js', 'scape.js', 'scape.html', 'scape-editor.js', 'scape.css', 'pcmtap.js', 'tour.js', 'i18n.js', 'i18n-de.js', 'i18n-de2.js', 'i18n-de3.js', 'notes-bridge.js', 'fonts.js',
   'atkinson-latin.woff2', 'atkinson-latin-ext.woff2', 'atkinson-italic-latin.woff2', 'atkinson-italic-latin-ext.woff2', 'OFL-Atkinson-Hyperlegible-Next.txt']) await copyFile(join(here, 'src', f), join(out, f));
 // the Critter Sounds logo (src/logo.svg) in the header, and its emblem (src/icon.svg, made by make-icons.cjs) in the title bar
 const logo = (await readFile(join(here, 'src', 'logo.svg'), 'utf8')).replace(/^[\s\S]*?(<svg)/, '$1').replace(/<svg[^>]*?viewBox="([^"]+)"[^>]*>/, (m, vb) => `<svg class="logo-svg" viewBox="${vb}" role="img" aria-label="Critter Sounds">`);
@@ -53,7 +53,7 @@ await copyFile(join(here, 'src', 'gameicons.json'), join(out, 'gameicons.json'))
 // the web version: desk-web.js comes before desk-boot.js, the page can be installed like an app, and each build's
 // scripts and styles have an address of their own, so a browser never mixes an old one into a new page
 const stamp = Date.now().toString(36);
-const webPage = s => (WEB ? s.replace('<script src="desk-boot.js"></script>', '<script src="desk-web.js"></script>\n<script src="desk-boot.js"></script>').replace('</title>', '</title>\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="icon" href="icon.svg">\n<meta name="theme-color" content="#0b0a12">')
+const webPage = s => (WEB ? s.replace('<script src="desk-boot.js"></script>', '<script src="desk-web.js"></script>\n<script src="desk-boot.js"></script>').replace('</title>', '</title>\n<link rel="manifest" href="manifest.webmanifest">\n<link rel="icon" href="icon.svg">\n<meta name="theme-color" content="#0b0a12">\n<meta name="apple-mobile-web-app-capable" content="yes">\n<meta name="mobile-web-app-capable" content="yes">\n<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n<meta name="apple-mobile-web-app-title" content="Critter Sounds">\n<meta name="format-detection" content="telephone=no">\n<link rel="apple-touch-icon" href="app-icon.png">')
   .replace(/(<script src="|<link rel="stylesheet" href=")([\w.-]+\.(?:js|css))"/g, (m, a, f) => `${a}${f}?v=${stamp}"`) : s);
 await writeFile(join(out, 'index.html'), webPage((await readFile(join(here, 'src', 'index.html'), 'utf8')).replace('<!--LOGO-->', () => logo)));
 if (WEB) await writeFile(join(out, 'scape.html'), webPage(await readFile(join(here, 'src', 'scape.html'), 'utf8')));
