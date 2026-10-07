@@ -697,3 +697,29 @@ body.playing .now::before{animation:none}
 .blogo .logomark{display:block;width:96px;height:96px;margin:0 auto}
 .modal .card.appear{width:min(560px,calc(100vw - 32px));max-height:86vh;overflow:auto}
 @media (prefers-reduced-motion:reduce){:root{--dur-fast:1ms;--dur:1ms;--dur-slow:1ms}}
+
+/* One flat button shape across the Critter apps (like Critter's send and tool-rail buttons): 8px corners, no borders,
+   no gradients, shadows or lift. Only the shape changes here; every colour comes from the tokens above. */
+.btn,.ib{border-radius:8px;border-color:transparent;box-shadow:none;transform:none}
+.btn{border:0;background:var(--hover-2,var(--hover))}
+.btn:hover{background:var(--press,var(--hover2))}
+.btn:active,.btn:hover,.ib:active,.tb:active,.tb.big:hover{transform:none}
+.btn.ghost{background:transparent}.btn.ghost:hover{background:var(--hover)}
+.ib{background:var(--hover-2,var(--hover))}.ib:hover{background:var(--press,var(--hover2))}
+/* primary, and toggles that are pressed, are filled with the highlight */
+.btn.primary,.btn.on,.btn.armed,.ib.on,.ib[aria-pressed=true],.btn[aria-pressed=true]{background:var(--accent);color:var(--on-accent,var(--accent-ink));box-shadow:inset 0 1px 0 rgb(255 255 255/.22);transition:filter .12s}
+.btn.primary:hover,.btn.on:hover,.ib.on:hover{background:var(--accent);box-shadow:inset 0 1px 0 rgb(255 255 255/.22);filter:brightness(1.07);transform:none}
+.btn.primary:active,.btn.on:active,.ib.on:active{filter:brightness(.94)}
+.btn.bad.armed{background:var(--bad);color:#fff}
+/* tabs: the chosen one in the hover tone, on the window's own colour */
+.tab{background:transparent;border-color:transparent;box-shadow:none}
+.tab:hover{background:var(--hover);border-color:transparent}
+.tab.on{background:var(--hover-2,var(--hover));border-color:transparent;box-shadow:none}
+.seg{background:transparent;border:0}
+.seg button{border-radius:8px}.seg button.on{background:var(--hover-2,var(--hover));box-shadow:none}
+/* round transport buttons and chips keep their shape, without gradients or lift */
+.tb{box-shadow:none}
+.tb.big{background:var(--accent);color:var(--on-accent,var(--accent-ink));box-shadow:inset 0 1px 0 rgb(255 255 255/.22);transition:filter .12s}
+.tb.big:hover{filter:brightness(1.07);box-shadow:inset 0 1px 0 rgb(255 255 255/.22)}.tb.big:active{filter:brightness(.94)}
+.tb[aria-pressed=true]{background:var(--accent);color:var(--on-accent,var(--accent-ink));box-shadow:inset 0 1px 0 rgb(255 255 255/.22)}
+body.playing .tb.big{animation:none}
