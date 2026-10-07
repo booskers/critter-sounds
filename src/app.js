@@ -662,7 +662,7 @@ async function connect() {
   const { code, key } = parseMusicCode($('#mcode').value);
   if (!code) { $('#mcode').focus(); return; }
   $('#mcode').value = showCode(code, key);
-  if (!window.claude) { hint('Choose a Homebase first: the same one your table uses.', 'warn'); if (window.CRITBOARD_DESKTOP) window.CRITBOARD_DESKTOP.changeHomebase(); return; }
+  if (!window.claude) { hint('Choose a Homebase first: the same one your table uses.', 'warn'); if (window.CRITTER_DESKTOP) window.CRITTER_DESKTOP.changeHomebase(); return; }
   await disconnect(true);
   $('#connBtn').disabled = true; chip('Connecting…');
   try {
@@ -2310,7 +2310,7 @@ async function settings() {
           h('button', { type: 'button', class: 'btn tiny ghost', text: 'Open the app\'s data folder', title: 'Your library, settings and bot tokens', onclick: () => desk.dataFolder() }),
           h('button', { type: 'button', class: 'btn tiny ghost', text: 'Back up the library…', title: 'Playlists, pads, scenes, layouts and settings, as one file', onclick: async () => { await desk.saveLib(LIB).catch(() => {}); const f = await desk.libBackup(); if (f) toast('Saved a backup: ' + f); } }))),
       sec('Connection',
-        h('div', { class: 'row' }, h('span', { class: 'grow hint', text: 'Homebase connects this app to Critter VTT. Use the same one as your table.' }), h('button', { type: 'button', class: 'btn tiny', text: 'Homebase…', onclick: () => { box.remove(); if (window.CRITBOARD_DESKTOP) window.CRITBOARD_DESKTOP.changeHomebase(); } }))),
+        h('div', { class: 'row' }, h('span', { class: 'grow hint', text: 'Homebase connects this app to Critter VTT. Use the same one as your table.' }), h('button', { type: 'button', class: 'btn tiny', text: 'Homebase…', onclick: () => { box.remove(); if (window.CRITTER_DESKTOP) window.CRITTER_DESKTOP.changeHomebase(); } }))),
       upd ? sec('Updates',
         h('label', { class: 'setchk' }, h('input', { type: 'checkbox', checked: upd.auto, onchange: e => desk.updates.set(e.target.checked) }), h('span', {}, h('b', { text: 'Check for updates when Critter Sounds starts' }), h('small', { text: 'A quiet look a few seconds after starting; it only speaks up when there is something new.' }))),
         h('div', { class: 'row' }, h('span', { class: 'grow hint notr', text: 'Critter Sounds ' + upd.version }),
@@ -2505,7 +2505,7 @@ function bind() {
   $('#seek').onchange = e => seek(+e.target.value);
   $('#conn').onsubmit = e => { e.preventDefault(); if (NET.on) disconnect(); else connect(); };
   $('#mcode').addEventListener('input', e => { const p = e.target.selectionStart; e.target.value = e.target.value.toUpperCase(); e.target.setSelectionRange(p, p); });
-  $('#hbBtn').onclick = () => window.CRITBOARD_DESKTOP && window.CRITBOARD_DESKTOP.changeHomebase();
+  $('#hbBtn').onclick = () => window.CRITTER_DESKTOP && window.CRITTER_DESKTOP.changeHomebase();
   $('#miniBtn').onclick = toggleMini;
   $('#themeBtn').onclick = appearance;
   // the top bar's and the transport's icons

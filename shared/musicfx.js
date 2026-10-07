@@ -1,4 +1,4 @@
-// copied from critboard/critboard.html (the MUSICFX block) by build.mjs: change it there
+// copied from crittervtt/crittervtt.html (the MUSICFX block) by build.mjs: change it there
 
 const MFX_SPACES = [['hall', 'Great hall'], ['cathedral', 'Cathedral'], ['cave', 'Cave'], ['room', 'Wooden room'], ['plate', 'Plate'], ['spring', 'Spring tank'], ['custom', 'Your own impulse file']];
 const MFX_LIST = [['reverb', 'Reverb'], ['space', 'Convolution space'], ['echo', 'Echo'], ['radio', 'Old radio'], ['crackle', 'Vinyl crackle'], ['warble', 'Tape warble'], ['muffle', 'Muffled'], ['lofi', 'Lo-fi'], ['trem', 'Tremolo'], ['comp', 'Even out loudness'], ['drive', 'Overdrive'], ['chorus', 'Chorus'], ['flanger', 'Flanger'], ['autopan', 'Auto-pan'], ['width', 'Stereo width']];

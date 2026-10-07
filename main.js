@@ -282,7 +282,7 @@ function appMenu() {
   const wc = win && win.webContents;
   return Menu.buildFromTemplate([
     { label: L('Mini player'), accelerator: 'CmdOrCtrl+M', click: () => wc && wc.send('key', 'mini') },
-    { label: L('Homebase…'), click: () => wc && wc.executeJavaScript('window.CRITBOARD_DESKTOP && window.CRITBOARD_DESKTOP.changeHomebase()') },
+    { label: L('Homebase…'), click: () => wc && wc.executeJavaScript('window.CRITTER_DESKTOP && window.CRITTER_DESKTOP.changeHomebase()') },
     { label: L('Appearance…'), click: () => wc && wc.send('key', 'appearance') },
     { label: L('Settings…'), accelerator: 'CmdOrCtrl+,', click: () => wc && wc.send('key', 'settings') },
     { label: L('Open the Critter Sounds folder'), click: () => { fs.mkdirSync(CS(), { recursive: true }); shell.openPath(CS()); } },

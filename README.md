@@ -49,11 +49,11 @@ npm start
 | `shared/` | Code that comes from [Critter](https://github.com/booskers/critter): the music effects and the Homebase client. |
 | `docs/` | This project's website (GitHub Pages). |
 
-**Shared with Critter:** the music effects (`shared/musicfx.js`) are the `MUSICFX` block of Critter's `critboard.html`, so the table and the app always sound the same. When this folder sits inside a Critter checkout (`critboard-desktop/music`), every build refreshes `shared/` from Critter's sources. On its own, it builds from the copies in `shared/`.
+**Shared with Critter:** the music effects (`shared/musicfx.js`) are the `MUSICFX` block of Critter's `crittervtt.html`, so the table and the app always sound the same. When this folder sits inside a Critter checkout (`crittervtt-desktop/music`), every build refreshes `shared/` from Critter's sources. On its own, it builds from the copies in `shared/`.
 
 **Homebase:** the app connects to the Homebase in `shared/homebase.config.json`. Set `HOMEBASE_SERVER=<url>` for a build that uses another one.
 
-The technical notes (streaming, effects, soundscapes, bots) are in Critter's [README](https://github.com/booskers/critter/blob/main/critboard-desktop/README.md#critter-sounds-the-desktop-music-player).
+The technical notes (streaming, effects, soundscapes, bots) are in Critter's [README](https://github.com/booskers/crittervtt/blob/main/crittervtt-desktop/README.md#critter-sounds-the-desktop-music-player).
 
 ## Updates
 
